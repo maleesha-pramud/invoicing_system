@@ -35,6 +35,63 @@
     <style>
         body { font-family: 'Manrope', sans-serif; }
         .material-symbols-outlined { font-size: 20px; }
+
+        @media print {
+            header, .no-print, nav, button:not(.print-show), .fixed {
+                display: none !important;
+            }
+
+            body {
+                background: white !important;
+                color: black !important;
+            }
+
+            main {
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
+
+            .bg-white, .dark\:bg-slate-900 {
+                background: white !important;
+                border-color: #e2e8f0 !important;
+                box-shadow: none !important;
+            }
+
+            .text-slate-900, .dark\:text-white, .text-slate-600, .dark\:text-slate-400 {
+                color: black !important;
+            }
+
+            .text-slate-500, .dark\:text-slate-300 {
+                color: #64748b !important;
+            }
+
+            [data-invoice-status] {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .bg-primary, .text-primary {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .lg\:col-span-2 {
+                page-break-inside: avoid;
+            }
+
+            .space-y-8 > div:last-child {
+                display: none !important;
+            }
+
+            table {
+                page-break-inside: auto;
+            }
+
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+        }
     </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
@@ -70,7 +127,7 @@
     <!-- Breadcrumbs & Actions -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-            <nav class="flex items-center gap-2 text-sm text-slate-500 mb-2">
+            <nav class="flex items-center gap-2 text-sm text-slate-500 mb-2 no-print">
                 <a class="hover:text-primary" href="invoice-list.html">Invoices</a>
                 <span class="material-symbols-outlined text-xs">chevron_right</span>
                 <span class="text-slate-900 dark:text-white font-medium" data-invoice-number>INV-0</span>
@@ -80,8 +137,8 @@
                 <span class="px-3 py-1 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-full text-xs font-bold uppercase tracking-wider" data-invoice-status>Pending</span>
             </div>
         </div>
-        <div class="flex flex-wrap items-center gap-3">
-            <button onclick="alert('PDF download feature coming soon!')" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+        <div class="flex flex-wrap items-center gap-3 no-print">
+            <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
                 <span class="material-symbols-outlined">download</span>
                 Download PDF
             </button>
@@ -92,7 +149,7 @@
         </div>
     </div>
     <!-- Tabbed Interface -->
-    <div class="border-b border-slate-200 dark:border-slate-800 mb-8">
+    <div class="border-b border-slate-200 dark:border-slate-800 mb-8 no-print">
         <div class="flex gap-8">
             <button class="pb-4 text-sm font-bold text-primary border-b-2 border-primary">
                 Invoice Details
@@ -112,7 +169,7 @@
                         <span class="material-symbols-outlined text-primary">person</span>
                         Client &amp; Billing Information
                     </h3>
-                    <button class="text-primary text-sm font-bold hover:underline">Edit Mode</button>
+                    <button class="text-primary text-sm font-bold hover:underline no-print">Edit Mode</button>
                 </div>
                 <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
@@ -142,7 +199,7 @@
                         <span class="material-symbols-outlined text-primary">list_alt</span>
                         Line Items
                     </h3>
-                    <button class="flex items-center gap-1 text-xs font-bold text-primary px-3 py-1.5 bg-primary/10 rounded-lg hover:bg-primary/20 transition-colors">
+                    <button class="flex items-center gap-1 text-xs font-bold text-primary px-3 py-1.5 bg-primary/10 rounded-lg hover:bg-primary/20 transition-colors no-print">
                         <span class="material-symbols-outlined text-sm">add</span> Add Item
                     </button>
                 </div>
@@ -170,22 +227,14 @@
             <div class="bg-primary text-white rounded-xl shadow-xl shadow-primary/20 p-8">
                 <h3 class="text-xs font-bold uppercase tracking-widest opacity-70 mb-6">Financial Summary</h3>
                 <div class="space-y-4">
-                    <div class="flex justify-between text-sm">
+                    <div class="flex justify-between text-xl">
                         <span class="opacity-80">Total Amount</span>
                         <span class="font-bold" data-total-amount>$0.00</span>
-                    </div>
-                    <div class="h-px bg-white/20 my-2"></div>
-                    <div class="flex justify-between items-end">
-                        <div>
-                            <span class="text-xs font-bold uppercase tracking-widest opacity-70">Total Due</span>
-                            <p class="text-4xl font-extrabold tracking-tight mt-1" data-total-amount>$0.00</p>
-                        </div>
                     </div>
                 </div>
             </div>
             <!-- Details Sidebar -->
             <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 space-y-6">
-                <h4 class="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-widest">Metadata</h4>
                 <div class="space-y-4">
                     <div class="flex items-center gap-3">
                         <div class="size-10 rounded-lg bg-background-light dark:bg-slate-800 flex items-center justify-center text-slate-500">
