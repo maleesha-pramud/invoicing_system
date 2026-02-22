@@ -39,8 +39,6 @@ public class ClientService {
                 client.setName(clientDTO.getName());
                 client.setEmail(clientDTO.getEmail());
                 client.setAddress(clientDTO.getAddress());
-                client.setCreatedAt(LocalDateTime.now());
-                client.setUpdatedAt(LocalDateTime.now());
 
                 session.persist(client);
                 transaction.commit();
@@ -191,7 +189,6 @@ public class ClientService {
                 client.setName(clientDTO.getName());
                 client.setEmail(clientDTO.getEmail());
                 client.setAddress(clientDTO.getAddress());
-                client.setUpdatedAt(LocalDateTime.now());
 
                 session.merge(client);
                 transaction.commit();

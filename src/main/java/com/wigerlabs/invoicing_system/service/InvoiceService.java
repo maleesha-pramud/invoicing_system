@@ -48,8 +48,6 @@ public class InvoiceService {
                 invoice.setTotalAmount(invoiceDTO.getTotalAmount());
                 invoice.setQuantity(invoiceDTO.getQuantity());
                 invoice.setStatus(invoiceStatus);
-                invoice.setCreatedAt(LocalDateTime.now());
-                invoice.setUpdatedAt(LocalDateTime.now());
 
                 session.persist(invoice);
                 transaction.commit();
@@ -206,7 +204,6 @@ public class InvoiceService {
                     invoice.setTotalAmount(invoiceDTO.getTotalAmount());
                     invoice.setQuantity(invoiceDTO.getQuantity());
                     invoice.setStatus(invoiceStatus);
-                    invoice.setUpdatedAt(LocalDateTime.now());
 
                     session.merge(invoice);
                     transaction.commit();

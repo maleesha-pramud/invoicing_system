@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "services")
-public class Service extends BaseEntity {
+public class Service {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -16,6 +16,11 @@ public class Service extends BaseEntity {
     private double unitPrice;
 
     public Service() {
+    }
+
+    public Service(String name, double unitPrice) {
+        this.name = name;
+        this.unitPrice = unitPrice;
     }
 
     public Service(int id, String name, double unitPrice) {

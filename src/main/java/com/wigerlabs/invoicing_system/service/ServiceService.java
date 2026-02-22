@@ -36,8 +36,6 @@ public class ServiceService {
                 Service service = new Service();
                 service.setName(serviceDTO.getName());
                 service.setUnitPrice(serviceDTO.getUnitPrice());
-                service.setCreatedAt(LocalDateTime.now());
-                service.setUpdatedAt(LocalDateTime.now());
 
                 session.persist(service);
                 transaction.commit();
@@ -183,7 +181,6 @@ public class ServiceService {
 
                 service.setName(serviceDTO.getName());
                 service.setUnitPrice(serviceDTO.getUnitPrice());
-                service.setUpdatedAt(LocalDateTime.now());
 
                 session.merge(service);
                 transaction.commit();
