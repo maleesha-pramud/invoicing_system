@@ -6,6 +6,7 @@
     <title>Invoicing Dash - Overview</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="js/script.js"></script>
     <!-- Google Fonts: Manrope -->
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
     <!-- Material Symbols Outlined -->
@@ -86,11 +87,11 @@
                 <p class="text-slate-500 dark:text-slate-400 mt-1">Manage your business revenue and outstanding invoices.</p>
             </div>
             <div class="flex flex-wrap gap-3">
-                <button class="flex items-center gap-2 rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95">
+                <button onclick="window.location.href='create-invoice.html'" class="flex items-center gap-2 rounded-lg h-11 px-5 bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95">
                     <span class="material-symbols-outlined text-xl">add_circle</span>
                     <span>New Invoice</span>
                 </button>
-                <button class="flex items-center gap-2 rounded-lg h-11 px-5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+                <button onclick="alert('Create new client feature coming soon!')" class="flex items-center gap-2 rounded-lg h-11 px-5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
                     <span class="material-symbols-outlined text-xl">person_add</span>
                     <span>New Client</span>
                 </button>
