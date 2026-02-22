@@ -1,7 +1,7 @@
 package com.wigerlabs.invoicing_system.dto;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +9,7 @@ public class InvoiceDTO implements Serializable {
     private int id;
     private int clientId;
     private String clientName;
-    private LocalDate date;
+    private Date date;
     private double totalAmount;
     private int statusId;
     private String status;
@@ -17,7 +17,7 @@ public class InvoiceDTO implements Serializable {
 
     public InvoiceDTO() {}
 
-    public InvoiceDTO(int id, int clientId, String clientName, LocalDate date, double totalAmount, int statusId, String status, List<InvoiceItemDTO> items) {
+    public InvoiceDTO(int id, int clientId, String clientName, Date date, double totalAmount, int statusId, String status, List<InvoiceItemDTO> items) {
         this.id = id;
         this.clientId = clientId;
         this.clientName = clientName;
@@ -37,8 +37,8 @@ public class InvoiceDTO implements Serializable {
     public String getClientName() { return clientName; }
     public void setClientName(String clientName) { this.clientName = clientName; }
 
-    public LocalDate getDate() { return date; }
-    public void setDate(LocalDate date) { this.date = date; }
+    public Date getDate() { return date; }
+    public void setDate(Date date) { this.date = date; }
 
     public double getTotalAmount() { return totalAmount; }
     public void setTotalAmount(double totalAmount) { this.totalAmount = totalAmount; }

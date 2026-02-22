@@ -14,8 +14,6 @@ import java.util.List;
 
 public class InvoiceService {
 
-    // ── helpers ──────────────────────────────────────────────────────────────
-
     private InvoiceDTO toDTO(Invoice invoice) {
         List<InvoiceItemDTO> itemDTOs = new ArrayList<>();
         for (InvoiceItem item : invoice.getItems()) {
@@ -39,8 +37,6 @@ public class InvoiceService {
         );
     }
 
-    // ── createInvoice ─────────────────────────────────────────────────────────
-
     public String createInvoice(InvoiceDTO invoiceDTO) {
         JsonObject responseObject = new JsonObject();
         boolean status = false;
@@ -48,6 +44,8 @@ public class InvoiceService {
 
         Session session = null;
         Transaction transaction = null;
+
+        System.out.println("Creating invoice for client ID: " + invoiceDTO.getClientId() + ", status ID: " + invoiceDTO.getStatusId() + ", items count: " + (invoiceDTO.getItems() != null ? invoiceDTO.getItems().size() : 0));
 
         try {
             session = HibernateUtil.getSessionFactory().openSession();

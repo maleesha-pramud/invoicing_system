@@ -1,7 +1,7 @@
 package com.wigerlabs.invoicing_system.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +17,7 @@ public class Invoice {
     private Client client;
 
     @Column(nullable = false)
-    private LocalDate date;
+    private Date date;
 
     @Column(name = "total_amount", nullable = false)
     private double totalAmount;
@@ -32,7 +32,7 @@ public class Invoice {
     public Invoice() {
     }
 
-    public Invoice(int id, Client client, LocalDate date, double totalAmount, Status status) {
+    public Invoice(int id, Client client, Date date, double totalAmount, Status status) {
         this.id = id;
         this.client = client;
         this.date = date;
@@ -56,11 +56,11 @@ public class Invoice {
         this.client = client;
     }
 
-    public LocalDate getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
