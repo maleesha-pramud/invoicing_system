@@ -1,0 +1,245 @@
+/* Enhanced AJAX and Real-time Feedback Animations */
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 20px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+.animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.animate-fade-out {
+    animation: fadeOut 0.3s ease-out;
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-bounce {
+    animation: bounce 1s ease-in-out infinite;
+}
+
+.animate-shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* Loading overlay styles */
+#loadingOverlay {
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* Notification styles */
+.notification-enter {
+    animation: slideUp 0.3s ease-out;
+}
+
+.notification-exit {
+    animation: fadeOut 0.3s ease-out;
+}
+
+/* Progress bar animation */
+#progressBar div {
+    transition: width 0.3s ease-out;
+}
+
+/* Form validation feedback */
+.border-green-500 {
+    border-color: #22c55e !important;
+    transition: border-color 0.3s ease;
+}
+
+.border-red-500 {
+    border-color: #ef4444 !important;
+    transition: border-color 0.3s ease;
+    animation: shake 0.5s ease-in-out;
+}
+
+.ring-green-500 {
+    --tw-ring-color: rgb(34 197 94);
+}
+
+.ring-red-500 {
+    --tw-ring-color: rgb(239 68 68);
+}
+
+.ring-yellow-500 {
+    --tw-ring-color: rgb(234 179 8);
+}
+
+/* Smooth transitions for table updates */
+table tbody tr {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Hover effects for interactive elements */
+button:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+}
+
+/* Loading state for buttons */
+button.loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+button.loading::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Success state for form fields */
+.success-flash {
+    animation: successFlash 0.5s ease-out;
+}
+
+@keyframes successFlash {
+    0% {
+        background-color: transparent;
+    }
+    50% {
+        background-color: rgba(34, 197, 94, 0.1);
+    }
+    100% {
+        background-color: transparent;
+    }
+}
+
+/* Error state for form fields */
+.error-flash {
+    animation: errorFlash 0.5s ease-out;
+}
+
+@keyframes errorFlash {
+    0% {
+        background-color: transparent;
+    }
+    50% {
+        background-color: rgba(239, 68, 68, 0.1);
+    }
+    100% {
+        background-color: transparent;
+    }
+}
+
+/* Skeleton loading for table rows */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Smooth height transitions */
+.smooth-height {
+    transition: height 0.3s ease-out;
+}
+
+/* Badge animations */
+.badge-pulse {
+    animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+

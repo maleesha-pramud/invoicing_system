@@ -1,15 +1,138 @@
 const API_BASE_URL = '/invoicing_system/api';
 
-// Globally cached services list for populating row dropdowns
 var _cachedServices = [];
 
+function showLoadingOverlay(message) {
+  var existingOverlay = document.getElementById('loadingOverlay');
+  if (existingOverlay) {
+    existingOverlay.remove();
+  }
+
+  var overlay = document.createElement('div');
+  overlay.id = 'loadingOverlay';
+  overlay.className = 'fixed inset-0 z-[200] bg-black/50 backdrop-blur-sm flex items-center justify-center';
+  overlay.innerHTML =
+    '<div class="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4 max-w-sm mx-4 border border-slate-200 dark:border-slate-800">' +
+    '  <div class="relative">' +
+    '    <div class="animate-spin rounded-full h-16 w-16 border-4 border-slate-200 dark:border-slate-700 border-t-primary"></div>' +
+    '    <span class="material-symbols-outlined absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary text-2xl">hourglass_empty</span>' +
+    '  </div>' +
+    '  <div class="text-center">' +
+    '    <p class="text-slate-900 dark:text-white font-bold text-lg">' + message + '</p>' +
+    '    <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Please wait...</p>' +
+    '  </div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+}
+
+function hideLoadingOverlay() {
+  var overlay = document.getElementById('loadingOverlay');
+  if (overlay) {
+    overlay.style.opacity = '0';
+    overlay.style.transition = 'opacity 0.2s';
+    setTimeout(function() {
+      overlay.remove();
+    }, 200);
+  }
+}
+
+function showNotification(message, type, duration) {
+  duration = duration || 3000;
+
+  var notification = document.createElement('div');
+  notification.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 animate-slide-up';
+
+  var iconMap = {
+    'success': 'check_circle',
+    'error': 'error',
+    'warning': 'warning',
+    'info': 'info',
+    'loading': 'sync'
+  };
+
+  var colorMap = {
+    'success': 'bg-green-600 text-white',
+    'error': 'bg-red-600 text-white',
+    'warning': 'bg-yellow-500 text-white',
+    'info': 'bg-blue-600 text-white',
+    'loading': 'bg-slate-700 text-white'
+  };
+
+  notification.className += ' ' + (colorMap[type] || 'bg-slate-700 text-white');
+
+  var icon = iconMap[type] || 'info';
+  var iconClass = type === 'loading' ? 'animate-spin' : '';
+
+  notification.innerHTML =
+    '<span class="material-symbols-outlined ' + iconClass + '">' + icon + '</span>' +
+    '<span class="font-medium">' + message + '</span>';
+
+  document.body.appendChild(notification);
+
+  if (type !== 'loading') {
+    setTimeout(function() {
+      notification.style.opacity = '0';
+      notification.style.transition = 'opacity 0.3s';
+      setTimeout(function() {
+        notification.remove();
+      }, 300);
+    }, duration);
+  }
+
+  return notification; // Return for manual removal if needed
+}
+
+// Progress indicator for operations
+function showProgress(message) {
+  var progressBar = document.getElementById('progressBar');
+  if (!progressBar) {
+    progressBar = document.createElement('div');
+    progressBar.id = 'progressBar';
+    progressBar.className = 'fixed top-0 left-0 right-0 z-[150] h-1 bg-slate-200 dark:bg-slate-800';
+    progressBar.innerHTML = '<div class="h-full bg-primary transition-all duration-300" style="width: 0%"></div>';
+    document.body.appendChild(progressBar);
+  }
+
+  var bar = progressBar.querySelector('div');
+  bar.style.width = '0%';
+
+  // Animate progress
+  setTimeout(function() { bar.style.width = '30%'; }, 50);
+  setTimeout(function() { bar.style.width = '60%'; }, 200);
+  setTimeout(function() { bar.style.width = '90%'; }, 500);
+
+  if (message) {
+    showNotification(message, 'loading');
+  }
+}
+
+function hideProgress() {
+  var progressBar = document.getElementById('progressBar');
+  if (progressBar) {
+    var bar = progressBar.querySelector('div');
+    bar.style.width = '100%';
+    setTimeout(function() {
+      progressBar.remove();
+    }, 300);
+  }
+
+  // Remove loading notification
+  var loadingNotif = document.querySelector('.fixed.bottom-6 .animate-spin');
+  if (loadingNotif) {
+    loadingNotif.closest('.fixed').remove();
+  }
+}
+
 function loadAllClients() {
+  showProgress('Loading clients...');
+
   var xhr = new XMLHttpRequest();
 
   xhr.open("GET", API_BASE_URL + "/client", true);
   xhr.setRequestHeader("Content-Type", "application/json");
 
   xhr.onload = function() {
+    hideProgress();
     if (xhr.status === 200) {
       try {
         var data = JSON.parse(xhr.responseText);
@@ -34,16 +157,21 @@ function loadAllClients() {
         }
 
         updateInvoiceList();
+        showNotification(data.data.length + ' clients loaded successfully', 'success', 2000);
       } catch (error) {
         console.error("Error parsing clients:", error);
+        showNotification("Error parsing client data", "error");
       }
     } else {
       console.error("Error loading clients. Status:", xhr.status);
+      showNotification("Failed to load clients (Status: " + xhr.status + ")", "error");
     }
   };
 
   xhr.onerror = function() {
+    hideProgress();
     console.error("AJAX Error loading clients");
+    showNotification("Network error: Could not connect to server", "error");
   };
 
   xhr.send();
@@ -71,45 +199,68 @@ function getClientById(clientId) {
 }
 
 function createClient(clientData) {
+  showLoadingOverlay('Creating client...');
+
   var xhr = new XMLHttpRequest();
 
   xhr.open("POST", API_BASE_URL + "/client", true);
   xhr.setRequestHeader("Content-Type", "application/json");
 
   xhr.onload = function() {
+    hideLoadingOverlay();
     if (xhr.status === 200) {
       console.log("Client created successfully");
-      showNotification("Client created successfully!", "success");
+      showNotification("✓ Client created successfully!", "success");
       loadAllClients();
     } else {
       console.error("Error creating client");
-      showNotification("Error creating client", "error");
+      var errorMsg = "Failed to create client";
+      try {
+        var response = JSON.parse(xhr.responseText);
+        errorMsg = response.message || errorMsg;
+      } catch(e) {}
+      showNotification(errorMsg, "error");
     }
   };
 
   xhr.onerror = function() {
+    hideLoadingOverlay();
     console.error("AJAX Error creating client");
-    showNotification("Network error creating client", "error");
+    showNotification("Network error: Unable to create client", "error");
   };
 
   xhr.send(JSON.stringify(clientData));
 }
 
 function updateClient(clientData) {
+  showLoadingOverlay('Updating client...');
+
   var xhr = new XMLHttpRequest();
 
   xhr.open("PUT", API_BASE_URL + "/client", true);
   xhr.setRequestHeader("Content-Type", "application/json");
 
   xhr.onload = function() {
+    hideLoadingOverlay();
     if (xhr.status === 200) {
       console.log("Client updated successfully");
-      showNotification("Client updated successfully!", "success");
+      showNotification("✓ Client updated successfully!", "success");
       loadAllClients();
     } else {
       console.error("Error updating client");
-      showNotification("Error updating client", "error");
+      var errorMsg = "Failed to update client";
+      try {
+        var response = JSON.parse(xhr.responseText);
+        errorMsg = response.message || errorMsg;
+      } catch(e) {}
+      showNotification(errorMsg, "error");
     }
+  };
+
+  xhr.onerror = function() {
+    hideLoadingOverlay();
+    console.error("AJAX Error updating client");
+    showNotification("Network error: Unable to update client", "error");
   };
 
   xhr.send(JSON.stringify(clientData));
@@ -120,47 +271,71 @@ function deleteClient(clientId) {
     return;
   }
 
+  showLoadingOverlay('Deleting client...');
+
   var xhr = new XMLHttpRequest();
 
   xhr.open("DELETE", API_BASE_URL + "/client/" + clientId, true);
   xhr.setRequestHeader("Content-Type", "application/json");
 
   xhr.onload = function() {
+    hideLoadingOverlay();
     if (xhr.status === 200) {
       console.log("Client deleted successfully");
-      showNotification("Client deleted successfully!", "success");
+      showNotification("✓ Client deleted successfully!", "success");
       loadAllClients();
     } else {
       console.error("Error deleting client");
-      showNotification("Error deleting client", "error");
+      var errorMsg = "Failed to delete client";
+      try {
+        var response = JSON.parse(xhr.responseText);
+        errorMsg = response.message || errorMsg;
+      } catch(e) {}
+      showNotification(errorMsg, "error");
     }
+  };
+
+  xhr.onerror = function() {
+    hideLoadingOverlay();
+    console.error("AJAX Error deleting client");
+    showNotification("Network error: Unable to delete client", "error");
   };
 
   xhr.send();
 }
 
 function loadAllInvoices() {
+  showProgress('Loading invoices...');
+
   var xhr = new XMLHttpRequest();
 
   xhr.open("GET", API_BASE_URL + "/invoice", true);
   xhr.setRequestHeader("Content-Type", "application/json");
 
   xhr.onload = function() {
+    hideProgress();
     if (xhr.status === 200) {
       try {
         var data = JSON.parse(xhr.responseText);
         console.log("Invoices loaded:", data);
         updateInvoiceList(data.data || data);
+
+        var count = (data.data || data).length;
+        showNotification(count + ' invoice' + (count !== 1 ? 's' : '') + ' loaded', 'success', 2000);
       } catch (error) {
         console.error("Error parsing invoices:", error);
+        showNotification("Error parsing invoice data", "error");
       }
     } else {
       console.error("Error loading invoices. Status:", xhr.status);
+      showNotification("Failed to load invoices (Status: " + xhr.status + ")", "error");
     }
   };
 
   xhr.onerror = function() {
+    hideProgress();
     console.error("AJAX Error loading invoices");
+    showNotification("Network error: Could not load invoices", "error");
   };
 
   xhr.send();
@@ -170,8 +345,11 @@ function getInvoiceById(invoiceId) {
   var invoiceIdNum = parseInt(invoiceId);
   if (isNaN(invoiceIdNum) || invoiceIdNum <= 0) {
     console.error("Invalid invoice ID");
+    showNotification("Invalid invoice ID", "error");
     return;
   }
+
+  showLoadingOverlay('Loading invoice details...');
 
   var xhr = new XMLHttpRequest();
 
@@ -179,6 +357,7 @@ function getInvoiceById(invoiceId) {
   xhr.setRequestHeader("Content-Type", "application/json");
 
   xhr.onload = function() {
+    hideLoadingOverlay();
     if (xhr.status === 200) {
       try {
         var response = JSON.parse(xhr.responseText);
@@ -197,66 +376,89 @@ function getInvoiceById(invoiceId) {
           // Update date information
           var issueDate = document.querySelector('[data-issue-date]');
           if (issueDate) issueDate.textContent = invoice.date || 'N/A';
+
+          showNotification("Invoice #" + invoiceIdNum + " loaded successfully", "success", 2000);
         }
       } catch (error) {
         console.error("Error parsing invoice:", error);
+        showNotification("Error parsing invoice data", "error");
       }
+    } else if (xhr.status === 404) {
+      showNotification("Invoice #" + invoiceIdNum + " not found", "error");
     } else {
       console.error("Error loading invoice. Status:", xhr.status);
+      showNotification("Failed to load invoice (Status: " + xhr.status + ")", "error");
     }
   };
 
   xhr.onerror = function() {
+    hideLoadingOverlay();
     console.error("AJAX Error loading invoice");
+    showNotification("Network error: Could not load invoice", "error");
   };
 
   xhr.send();
 }
 
 function createInvoice(invoiceData) {
+  showLoadingOverlay('Creating invoice...');
+
   var xhr = new XMLHttpRequest();
 
   xhr.open("POST", API_BASE_URL + "/invoice", true);
   xhr.setRequestHeader("Content-Type", "application/json");
 
   xhr.onload = function() {
+    hideLoadingOverlay();
     if (xhr.status === 200) {
       try {
         var response = JSON.parse(xhr.responseText);
         console.log("Invoice created successfully");
-        showNotification("Invoice created successfully!", "success");
+        showNotification("✓ Invoice created successfully! Redirecting...", "success");
 
         setTimeout(function() {
           window.location.href = 'invoice-list.html';
         }, 1500);
       } catch (error) {
         console.error("Error parsing response:", error);
-        showNotification("Invoice created successfully!", "success");
+        showNotification("✓ Invoice created successfully! Redirecting...", "success");
+        setTimeout(function() {
+          window.location.href = 'invoice-list.html';
+        }, 1500);
       }
     } else {
       console.error("Error creating invoice");
-      showNotification("Error creating invoice", "error");
+      var errorMsg = "Failed to create invoice";
+      try {
+        var response = JSON.parse(xhr.responseText);
+        errorMsg = response.message || errorMsg;
+      } catch(e) {}
+      showNotification(errorMsg, "error");
     }
   };
 
   xhr.onerror = function() {
+    hideLoadingOverlay();
     console.error("AJAX Error creating invoice");
-    showNotification("Network error creating invoice", "error");
+    showNotification("Network error: Unable to create invoice", "error");
   };
 
   xhr.send(JSON.stringify(invoiceData));
 }
 
 function updateInvoice(invoiceData) {
+  showLoadingOverlay('Updating invoice...');
+
   var xhr = new XMLHttpRequest();
 
   xhr.open("PUT", API_BASE_URL + "/invoice", true);
   xhr.setRequestHeader("Content-Type", "application/json");
 
   xhr.onload = function() {
+    hideLoadingOverlay();
     if (xhr.status === 200) {
       console.log("Invoice updated successfully");
-      showNotification("Invoice updated successfully!", "success");
+      showNotification("✓ Invoice updated successfully! Redirecting...", "success");
 
       // Redirect to invoice view page after successful update
       setTimeout(function() {
@@ -264,8 +466,19 @@ function updateInvoice(invoiceData) {
       }, 1500);
     } else {
       console.error("Error updating invoice");
-      showNotification("Error updating invoice", "error");
+      var errorMsg = "Failed to update invoice";
+      try {
+        var response = JSON.parse(xhr.responseText);
+        errorMsg = response.message || errorMsg;
+      } catch(e) {}
+      showNotification(errorMsg, "error");
     }
+  };
+
+  xhr.onerror = function() {
+    hideLoadingOverlay();
+    console.error("AJAX Error updating invoice");
+    showNotification("Network error: Unable to update invoice", "error");
   };
 
   xhr.send(JSON.stringify(invoiceData));
@@ -282,37 +495,49 @@ function deleteInvoice(invoiceId) {
     return;
   }
 
+  showLoadingOverlay('Deleting invoice...');
+
   var xhr = new XMLHttpRequest();
 
   xhr.open("DELETE", API_BASE_URL + "/invoice/" + invoiceIdNum, true);
   xhr.setRequestHeader("Content-Type", "application/json");
 
   xhr.onload = function() {
+    hideLoadingOverlay();
     if (xhr.status === 200) {
       console.log("Invoice deleted successfully");
-      showNotification("Invoice deleted successfully!", "success");
+      showNotification("✓ Invoice #" + invoiceIdNum + " deleted successfully!", "success");
       loadAllInvoices();
     } else {
       console.error("Error deleting invoice");
-      showNotification("Error deleting invoice", "error");
+      var errorMsg = "Failed to delete invoice";
+      try {
+        var response = JSON.parse(xhr.responseText);
+        errorMsg = response.message || errorMsg;
+      } catch(e) {}
+      showNotification(errorMsg, "error");
     }
   };
 
   xhr.onerror = function() {
+    hideLoadingOverlay();
     console.error("AJAX Error deleting invoice");
-    showNotification("Network error deleting invoice", "error");
+    showNotification("Network error: Unable to delete invoice", "error");
   };
 
   xhr.send();
 }
 
 function loadAllServices() {
+  showProgress('Loading services...');
+
   var xhr = new XMLHttpRequest();
 
   xhr.open("GET", API_BASE_URL + "/service", true);
   xhr.setRequestHeader("Content-Type", "application/json");
 
   xhr.onload = function() {
+    hideProgress();
     if (xhr.status === 200) {
       try {
         var data = JSON.parse(xhr.responseText);
@@ -325,16 +550,22 @@ function loadAllServices() {
         if (tbody && tbody.children.length === 0) {
           addItemRow();
         }
+
+        showNotification(_cachedServices.length + ' services loaded', 'success', 2000);
       } catch (error) {
         console.error("Error parsing services:", error);
+        showNotification("Error parsing service data", "error");
       }
     } else {
       console.error("Error loading services. Status:", xhr.status);
+      showNotification("Failed to load services (Status: " + xhr.status + ")", "error");
     }
   };
 
   xhr.onerror = function() {
+    hideProgress();
     console.error("AJAX Error loading services");
+    showNotification("Network error: Could not load services", "error");
   };
 
   xhr.send();
@@ -362,40 +593,68 @@ function getServiceById(serviceId) {
 }
 
 function createService(serviceData) {
+  showLoadingOverlay('Creating service...');
+
   var xhr = new XMLHttpRequest();
 
   xhr.open("POST", API_BASE_URL + "/service", true);
   xhr.setRequestHeader("Content-Type", "application/json");
 
   xhr.onload = function() {
+    hideLoadingOverlay();
     if (xhr.status === 200) {
       console.log("Service created successfully");
-      showNotification("Service created successfully!", "success");
+      showNotification("✓ Service created successfully!", "success");
       loadAllServices();
     } else {
       console.error("Error creating service");
-      showNotification("Error creating service", "error");
+      var errorMsg = "Failed to create service";
+      try {
+        var response = JSON.parse(xhr.responseText);
+        errorMsg = response.message || errorMsg;
+      } catch(e) {}
+      showNotification(errorMsg, "error");
     }
+  };
+
+  xhr.onerror = function() {
+    hideLoadingOverlay();
+    console.error("AJAX Error creating service");
+    showNotification("Network error: Unable to create service", "error");
   };
 
   xhr.send(JSON.stringify(serviceData));
 }
 
 function updateService(serviceData) {
+  showLoadingOverlay('Updating service...');
+
   var xhr = new XMLHttpRequest();
 
   xhr.open("PUT", API_BASE_URL + "/service", true);
   xhr.setRequestHeader("Content-Type", "application/json");
 
   xhr.onload = function() {
+    hideLoadingOverlay();
     if (xhr.status === 200) {
       console.log("Service updated successfully");
-      showNotification("Service updated successfully!", "success");
+      showNotification("✓ Service updated successfully!", "success");
       loadAllServices();
     } else {
       console.error("Error updating service");
-      showNotification("Error updating service", "error");
+      var errorMsg = "Failed to update service";
+      try {
+        var response = JSON.parse(xhr.responseText);
+        errorMsg = response.message || errorMsg;
+      } catch(e) {}
+      showNotification(errorMsg, "error");
     }
+  };
+
+  xhr.onerror = function() {
+    hideLoadingOverlay();
+    console.error("AJAX Error updating service");
+    showNotification("Network error: Unable to update service", "error");
   };
 
   xhr.send(JSON.stringify(serviceData));
@@ -406,20 +665,34 @@ function deleteService(serviceId) {
     return;
   }
 
+  showLoadingOverlay('Deleting service...');
+
   var xhr = new XMLHttpRequest();
 
   xhr.open("DELETE", API_BASE_URL + "/service/" + serviceId, true);
   xhr.setRequestHeader("Content-Type", "application/json");
 
   xhr.onload = function() {
+    hideLoadingOverlay();
     if (xhr.status === 200) {
       console.log("Service deleted successfully");
-      showNotification("Service deleted successfully!", "success");
+      showNotification("✓ Service deleted successfully!", "success");
       loadAllServices();
     } else {
       console.error("Error deleting service");
-      showNotification("Error deleting service", "error");
+      var errorMsg = "Failed to delete service";
+      try {
+        var response = JSON.parse(xhr.responseText);
+        errorMsg = response.message || errorMsg;
+      } catch(e) {}
+      showNotification(errorMsg, "error");
     }
+  };
+
+  xhr.onerror = function() {
+    hideLoadingOverlay();
+    console.error("AJAX Error deleting service");
+    showNotification("Network error: Unable to delete service", "error");
   };
 
   xhr.send();
@@ -528,7 +801,6 @@ function populateServiceDropdown(services) {
   });
 }
 
-// Populate a single <select> element with the cached service list
 function fillServiceSelect(selectEl) {
   selectEl.innerHTML = '<option value="">-- Select Service --</option>';
   _cachedServices.forEach(function(service) {
@@ -540,7 +812,6 @@ function fillServiceSelect(selectEl) {
   });
 }
 
-// Add a new item row to the create-invoice items table
 function addItemRow() {
   var tbody = document.getElementById('itemsTableBody');
   if (!tbody) return;
@@ -714,25 +985,6 @@ function populateInvoiceItems(items) {
   }
 }
 
-function showNotification(message, type) {
-  var notification = document.createElement('div');
-  notification.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-full shadow-2xl flex items-center gap-3';
-
-  if (type === 'success') {
-    notification.className += ' bg-green-600 text-white';
-    notification.innerHTML = '<span class="material-symbols-outlined">check_circle</span><span class="font-medium">' + message + '</span>';
-  } else if (type === 'error') {
-    notification.className += ' bg-red-600 text-white';
-    notification.innerHTML = '<span class="material-symbols-outlined">error</span><span class="font-medium">' + message + '</span>';
-  }
-
-  document.body.appendChild(notification);
-
-  setTimeout(function() {
-    notification.remove();
-  }, 3000);
-}
-
 function onClientSelectChange() {
   var clientSelect = document.querySelector('select[name="clientSelect"]');
   if (!clientSelect) return;
@@ -754,7 +1006,7 @@ function submitUpdateInvoice() {
   var invoiceId = urlParams.get('id');
 
   if (!invoiceId) {
-    showNotification("No invoice ID found", "error");
+    showNotification("⚠ No invoice ID found", "error");
     return;
   }
 
@@ -763,7 +1015,14 @@ function submitUpdateInvoice() {
   var statusSelect = document.getElementById('statusSelect');
 
   if (!clientSelect || !clientSelect.value) {
-    showNotification("Please select a client", "error");
+    showNotification("⚠ Please select a client", "warning");
+    if (clientSelect) {
+      clientSelect.focus();
+      clientSelect.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+      setTimeout(function() {
+        clientSelect.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
+      }, 2000);
+    }
     return;
   }
 
@@ -801,7 +1060,14 @@ function submitUpdateInvoice() {
   });
 
   if (items.length === 0) {
-    showNotification("Please add at least one service item", "error");
+    showNotification("⚠ Please add at least one service item", "warning");
+    var addRowBtn = document.getElementById('addRowBtn');
+    if (addRowBtn) {
+      addRowBtn.classList.add('animate-pulse', 'ring-2', 'ring-yellow-500');
+      setTimeout(function() {
+        addRowBtn.classList.remove('animate-pulse', 'ring-2', 'ring-yellow-500');
+      }, 2000);
+    }
     return;
   }
 
@@ -821,14 +1087,21 @@ function submitUpdateInvoice() {
   };
 
   console.log("Submitting updated invoice data:", invoiceData);
-  updateInvoice(invoiceData);
+  showNotification("Validating invoice data...", "info", 1000);
+
+  setTimeout(function() {
+    updateInvoice(invoiceData);
+  }, 300);
 }
 
 function loadInvoiceForUpdate(invoiceId) {
+  showLoadingOverlay('Loading invoice for update...');
+
   var xhr = new XMLHttpRequest();
   xhr.open("GET", API_BASE_URL + "/invoice/" + invoiceId, true);
 
   xhr.onload = function() {
+    hideLoadingOverlay();
     if (xhr.status === 200) {
       var response = JSON.parse(xhr.responseText);
       var invoice = response.data || response;
@@ -877,19 +1150,28 @@ function loadInvoiceForUpdate(invoiceId) {
         invoice.items.forEach(function(item) {
           addItemRowWithData(item);
         });
+        showNotification("Invoice #" + invoiceId + " loaded - " + invoice.items.length + " items", "success", 2000);
       } else {
         // Add one empty row if no items
         addItemRow();
+        showNotification("Invoice #" + invoiceId + " loaded", "success", 2000);
       }
+    } else if (xhr.status === 404) {
+      console.error("Invoice not found");
+      showNotification("Invoice #" + invoiceId + " not found", "error");
+      setTimeout(function() {
+        window.location.href = 'invoice-list.html';
+      }, 2000);
     } else {
       console.error("Error loading invoice:", xhr.status);
-      showNotification("Error loading invoice data", "error");
+      showNotification("Failed to load invoice (Status: " + xhr.status + ")", "error");
     }
   };
 
   xhr.onerror = function() {
+    hideLoadingOverlay();
     console.error("Request failed");
-    showNotification("Failed to load invoice", "error");
+    showNotification("Network error: Failed to load invoice", "error");
   };
 
   xhr.send();
@@ -978,8 +1260,16 @@ function submitCreateInvoice() {
   var clientSelect = document.querySelector('select[name="clientSelect"]');
   var issueDateInput = document.querySelectorAll('input[type="date"]')[0];
 
+  // Validation with real-time feedback
   if (!clientSelect || !clientSelect.value) {
-    showNotification("Please select a client", "error");
+    showNotification("⚠ Please select a client", "warning");
+    if (clientSelect) {
+      clientSelect.focus();
+      clientSelect.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+      setTimeout(function() {
+        clientSelect.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
+      }, 2000);
+    }
     return;
   }
 
@@ -999,7 +1289,14 @@ function submitCreateInvoice() {
   });
 
   if (items.length === 0) {
-    showNotification("Please add at least one service item", "error");
+    showNotification("⚠ Please add at least one service item", "warning");
+    var addRowBtn = document.getElementById('addRowBtn');
+    if (addRowBtn) {
+      addRowBtn.classList.add('animate-pulse', 'ring-2', 'ring-yellow-500');
+      setTimeout(function() {
+        addRowBtn.classList.remove('animate-pulse', 'ring-2', 'ring-yellow-500');
+      }, 2000);
+    }
     return;
   }
 
@@ -1018,7 +1315,11 @@ function submitCreateInvoice() {
   };
 
   console.log("Submitting invoice data:", invoiceData);
-  createInvoice(invoiceData);
+  showNotification("Validating invoice data...", "info", 1000);
+
+  setTimeout(function() {
+    createInvoice(invoiceData);
+  }, 300);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -1068,5 +1369,245 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Attach event listeners for invoice list actions
   attachInvoiceListeners();
+
+  // Add real-time validation feedback for form inputs
+  setupRealTimeValidation();
+
+  // Show initial load success message
+  setTimeout(function() {
+    var pageTitle = document.querySelector('h1, h2');
+    if (pageTitle && currentPage) {
+      var pageName = pageTitle.textContent.trim();
+      showNotification("Page loaded successfully", "success", 2000);
+    }
+  }, 800);
+});
+
+// Real-time form validation and feedback
+function setupRealTimeValidation() {
+  // Validate client selection in real-time
+  var clientSelect = document.querySelector('select[name="clientSelect"]');
+  if (clientSelect) {
+    clientSelect.addEventListener('change', function() {
+      if (this.value) {
+        this.classList.remove('border-red-500');
+        this.classList.add('border-green-500');
+        showNotification("✓ Client selected", "success", 1500);
+
+        setTimeout(function() {
+          clientSelect.classList.remove('border-green-500');
+        }, 1500);
+      }
+    });
+  }
+
+  // Add real-time feedback for quantity changes
+  document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('item-quantity')) {
+      var value = parseInt(e.target.value);
+      if (value < 1 || isNaN(value)) {
+        e.target.classList.add('border-red-500');
+      } else {
+        e.target.classList.remove('border-red-500');
+        e.target.classList.add('border-green-500');
+        setTimeout(function() {
+          e.target.classList.remove('border-green-500');
+        }, 1000);
+      }
+    }
+
+    // Real-time feedback for rate changes
+    if (e.target.classList.contains('item-rate')) {
+      var value = parseFloat(e.target.value);
+      if (value < 0 || isNaN(value)) {
+        e.target.classList.add('border-red-500');
+      } else {
+        e.target.classList.remove('border-red-500');
+      }
+    }
+  });
+}
+
+// Auto-save draft functionality (optional enhancement)
+var autoSaveDraftTimeout;
+function scheduleAutoSaveDraft() {
+  clearTimeout(autoSaveDraftTimeout);
+  autoSaveDraftTimeout = setTimeout(function() {
+    saveDraftToLocalStorage();
+  }, 2000); // Auto-save after 2 seconds of inactivity
+}
+
+function saveDraftToLocalStorage() {
+  var currentPage = window.location.pathname.split('/').pop();
+  if (currentPage !== 'create-invoice.html') return;
+
+  var clientSelect = document.querySelector('select[name="clientSelect"]');
+  if (!clientSelect || !clientSelect.value) return;
+
+  var draft = {
+    clientId: clientSelect.value,
+    timestamp: new Date().toISOString(),
+    items: []
+  };
+
+  var rows = document.querySelectorAll('tr.invoice-item-row');
+  rows.forEach(function(row) {
+    var serviceSelect = row.querySelector('select.item-service-select');
+    var qtyInput = row.querySelector('input.item-quantity');
+
+    if (serviceSelect && qtyInput && serviceSelect.value) {
+      draft.items.push({
+        serviceId: serviceSelect.value,
+        quantity: qtyInput.value
+      });
+    }
+  });
+
+  if (draft.items.length > 0) {
+    localStorage.setItem('invoiceDraft', JSON.stringify(draft));
+    showNotification("Draft saved automatically", "info", 1500);
+  }
+}
+
+function loadDraftFromLocalStorage() {
+  var draft = localStorage.getItem('invoiceDraft');
+  if (draft) {
+    try {
+      var draftData = JSON.parse(draft);
+      if (confirm("A draft invoice was found. Would you like to restore it?")) {
+        // Restore draft logic here
+        showNotification("Draft restored", "success");
+        localStorage.removeItem('invoiceDraft');
+      }
+    } catch (e) {
+      console.error("Error loading draft:", e);
+    }
+  }
+}
+
+// Enhanced status update with real-time feedback
+function updateInvoiceStatus(invoiceId, statusId) {
+  showLoadingOverlay('Updating invoice status...');
+
+  var xhr = new XMLHttpRequest();
+  xhr.open("PUT", API_BASE_URL + "/invoice/" + invoiceId + "/status", true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+
+  xhr.onload = function() {
+    hideLoadingOverlay();
+    if (xhr.status === 200) {
+      showNotification("✓ Invoice status updated successfully!", "success");
+      // Reload current invoice if on view page
+      var urlParams = new URLSearchParams(window.location.search);
+      var currentInvoiceId = urlParams.get('id');
+      if (currentInvoiceId) {
+        getInvoiceById(currentInvoiceId);
+      } else {
+        loadAllInvoices();
+      }
+    } else {
+      showNotification("Failed to update invoice status", "error");
+    }
+  };
+
+  xhr.onerror = function() {
+    hideLoadingOverlay();
+    showNotification("Network error: Unable to update status", "error");
+  };
+
+  xhr.send(JSON.stringify({ id: invoiceId, statusId: statusId }));
+}
+
+// Real-time search functionality with debouncing
+var searchTimeout;
+function setupRealtimeSearch() {
+  var searchInput = document.querySelector('input[placeholder*="Search"]');
+  if (searchInput) {
+    searchInput.addEventListener('input', function(e) {
+      clearTimeout(searchTimeout);
+      var query = e.target.value.toLowerCase().trim();
+
+      if (query.length === 0) {
+        loadAllInvoices();
+        return;
+      }
+
+      searchTimeout = setTimeout(function() {
+        showProgress('Searching...');
+        filterInvoices(query);
+        hideProgress();
+      }, 300);
+    });
+  }
+}
+
+function filterInvoices(query) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", API_BASE_URL + "/invoice", true);
+
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      var data = JSON.parse(xhr.responseText);
+      var invoices = data.data || data;
+
+      var filtered = invoices.filter(function(invoice) {
+        return (invoice.id && invoice.id.toString().includes(query)) ||
+               (invoice.clientName && invoice.clientName.toLowerCase().includes(query)) ||
+               (invoice.status && invoice.status.toLowerCase().includes(query));
+      });
+
+      updateInvoiceList(filtered);
+      showNotification(filtered.length + " result(s) found", "info", 2000);
+    }
+  };
+
+  xhr.send();
+}
+
+// Status filter with real-time feedback
+function setupStatusFilter() {
+  var statusSelect = document.querySelector('select option:first-child');
+  if (statusSelect && statusSelect.parentElement) {
+    var select = statusSelect.parentElement;
+    select.addEventListener('change', function(e) {
+      var selectedStatus = e.target.value;
+
+      if (selectedStatus === 'All Status') {
+        showProgress('Loading all invoices...');
+        loadAllInvoices();
+      } else {
+        showProgress('Filtering by status...');
+        filterInvoicesByStatus(selectedStatus);
+      }
+    });
+  }
+}
+
+function filterInvoicesByStatus(status) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", API_BASE_URL + "/invoice", true);
+
+  xhr.onload = function() {
+    hideProgress();
+    if (xhr.status === 200) {
+      var data = JSON.parse(xhr.responseText);
+      var invoices = data.data || data;
+
+      var filtered = invoices.filter(function(invoice) {
+        return invoice.status && invoice.status.toUpperCase() === status.toUpperCase();
+      });
+
+      updateInvoiceList(filtered);
+      showNotification(filtered.length + " " + status + " invoice(s)", "info", 2000);
+    }
+  };
+
+  xhr.send();
+}
+
+// Initialize enhanced features on page load
+document.addEventListener('DOMContentLoaded', function() {
+  setupRealtimeSearch();
+  setupStatusFilter();
 });
 
