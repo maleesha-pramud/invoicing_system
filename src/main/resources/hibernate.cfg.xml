@@ -16,5 +16,7 @@
         <!-- <property name="hibernate.hbm2ddl.auto">update</property> -->
         <mapping class="com.wigerlabs.invoicing_system.entity.Client"/>
         <mapping class="com.wigerlabs.invoicing_system.entity.Service"/>
+        <mapping class="com.wigerlabs.invoicing_system.entity.Status"/>
+        <mapping class="com.wigerlabs.invoicing_system.entity.Invoice"/>
     </session-factory>
 </hibernate-configuration>
