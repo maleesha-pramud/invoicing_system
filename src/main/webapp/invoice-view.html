@@ -37,26 +37,77 @@
         .material-symbols-outlined { font-size: 20px; }
 
         @media print {
-            header, .no-print, .fixed {
-                display: none !important;
+            /* Remove all default margins and paddings */
+            * {
+                margin: 0 !important;
+                padding: 0 !important;
             }
 
-            body {
+            @page {
+                margin: 0.5cm;
+            }
+
+            html, body {
+                margin: 0 !important;
+                padding: 0 !important;
                 background: white !important;
                 color: black !important;
             }
 
+            /* Hide navigation and non-essential elements */
+            header, .no-print, .fixed, aside {
+                display: none !important;
+            }
+
+            /* Reset flex layout */
+            .flex.min-h-screen {
+                display: block !important;
+            }
+
+            /* Reset main container */
             main {
-                padding: 20px !important;
+                margin: 0 !important;
+                padding: 10px !important;
+                max-width: 100% !important;
+                width: 100% !important;
+            }
+
+            /* Reset inner containers */
+            main > div {
+                margin: 0 !important;
+                padding: 0 !important;
                 max-width: 100% !important;
             }
 
+            /* Reset grid layout for print */
+            .grid {
+                display: block !important;
+            }
+
+            .lg\:col-span-2 {
+                page-break-inside: avoid;
+            }
+
+            /* Reset spacing utilities */
+            .space-y-8 > * + *,
+            .space-y-6 > * + *,
+            .space-y-4 > * + *,
+            .gap-8,
+            .gap-6,
+            .gap-4 {
+                margin-top: 8px !important;
+            }
+
+            /* Card styling for print */
             .bg-white, .dark\:bg-slate-900, .rounded-xl {
                 background: white !important;
                 border-color: #e2e8f0 !important;
                 box-shadow: none !important;
+                padding: 12px !important;
+                margin-bottom: 12px !important;
             }
 
+            /* Text colors for print */
             .text-slate-900, .dark\:text-white {
                 color: black !important;
             }
@@ -65,6 +116,7 @@
                 color: #4a5568 !important;
             }
 
+            /* Preserve colors for important elements */
             [data-invoice-status] {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
@@ -75,13 +127,12 @@
                 print-color-adjust: exact !important;
             }
 
-            .lg\:col-span-2 {
-                page-break-inside: avoid;
-            }
-
+            /* Table styling */
             table {
                 page-break-inside: auto;
                 border-collapse: collapse !important;
+                width: 100% !important;
+                margin-top: 8px !important;
             }
 
             thead {
@@ -112,205 +163,235 @@
                 background: #f9fafb !important;
             }
 
+            /* Hide delete buttons column */
             th:last-child, td:last-child {
                 display: none !important;
+            }
+
+            /* Ensure proper spacing */
+            h1, h2, h3, h4, h5, h6 {
+                margin-bottom: 8px !important;
+                padding: 4px !important;
+            }
+
+            p {
+                padding: 2px !important;
             }
         }
     </style>
 </head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
-<!-- Top Navigation Bar -->
-<header class="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex h-16 items-center justify-between">
-            <div class="flex items-center gap-8">
-                <div class="flex items-center gap-2 text-primary">
-                    <span class="material-symbols-outlined text-3xl font-bold">description</span>
-                    <span class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">Invoicify</span>
-                </div>
-                <nav class="hidden md:flex items-center gap-6">
-                    <a class="text-sm font-semibold text-primary" href="invoice-list.html">Invoices</a>
-                </nav>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col fixed h-full no-print">
+        <div class="p-6 flex items-center gap-3">
+            <div class="size-10 bg-primary rounded-lg flex items-center justify-center text-white">
+                <span class="material-symbols-outlined">payments</span>
             </div>
-            <div class="flex items-center gap-4">
-                <button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                    <span class="material-symbols-outlined">notifications</span>
-                </button>
-                <button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                    <span class="material-symbols-outlined">settings</span>
-                </button>
-                <div class="h-8 w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden">
-                    <img alt="User Profile" class="h-full w-full object-cover" data-alt="User profile avatar circle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5MD7hycc7fPaeyxZ8ea4AeCk9raaBGsIkaYpzGf4I4Ezr8S5lM0V8cGObaigIMY8QlUuT8cx4uSReBZ0Xr4tCUYVFNKlC9Dlj-r2KZLI7rFxzqPChWdv0cmhqozlLAsrThii07HL1sBblsjc7F2mAnyRszA5SwYG8CHXr4yqK9ymDnWSPpgcjHx_C_EDZlWgEfhia5naG-JTOJ8WjzvdAL8fPuNHoADLPRfDgmv5JgMQyzwC63I3kOlvLXzvVNSOJKnrTNMbeL7M"/>
+            <div>
+                <h1 class="text-lg font-bold leading-none">FinancePro</h1>
+                <p class="text-xs text-slate-500 mt-1">Admin Dashboard</p>
+            </div>
+        </div>
+        <nav class="flex-1 px-4 space-y-1 mt-4">
+            <a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="dashboard.html">
+                <span class="material-symbols-outlined">grid_view</span>
+                <span class="text-sm font-medium">Dashboard</span>
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2.5 bg-primary/10 text-primary rounded-lg transition-colors" href="invoice-list.html">
+                <span class="material-symbols-outlined">description</span>
+                <span class="text-sm font-medium">Invoices</span>
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+                <span class="material-symbols-outlined">group</span>
+                <span class="text-sm font-medium">Clients</span>
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+                <span class="material-symbols-outlined">analytics</span>
+                <span class="text-sm font-medium">Reports</span>
+            </a>
+            <div class="pt-4 pb-2">
+                <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">Support</p>
+            </div>
+            <a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="text-sm font-medium">Settings</span>
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+                <span class="material-symbols-outlined">help</span>
+                <span class="text-sm font-medium">Help Center</span>
+            </a>
+        </nav>
+        <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+            <div class="flex items-center gap-3 px-2 py-2">
+                <div class="size-9 rounded-full bg-slate-200 overflow-hidden">
+                    <img alt="User Profile" class="w-full h-full object-cover" data-alt="Professional male corporate user profile photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9g7YHNAy5OQ69FVynj1pLCxvmA5HW72YP_i8S-TEOSViwxy0xE2htJ1bpOoffqa9BUhCaPdX5Tfbb1mX0DMGihoKMATEioDIJVCIlCXynhEvjQv7goeERZt-9cngaZgo02D1SXLXx5cfYsJr5ff26-1mGFFthjIYuTiInAXTPagWy2X5GcbV0XiCUAE6dmdOE5DOUTdIcGGoFfhLEtAqFER9d_BE_C1lnTqxsSef0Gs8JMCWGNzOryQrvqwTFnYVt60w3J5cY5PU"/>
+                </div>
+                <div class="flex-1 overflow-hidden">
+                    <p class="text-sm font-semibold truncate">Maleesha Pramud</p>
+                    <p class="text-xs text-slate-500 truncate">Billing Manager</p>
                 </div>
             </div>
         </div>
-    </div>
-</header>
-<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Breadcrumbs & Actions -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-            <nav class="flex items-center gap-2 text-sm text-slate-500 mb-2 no-print">
+    </aside>
+    <!-- Main Content -->
+    <main class="flex-1 ml-64">
+        <!-- Header -->
+        <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 sticky top-0 z-10 no-print">
+            <div class="flex items-center gap-2 text-sm text-slate-500">
+                <a class="hover:text-primary" href="dashboard.html">Home</a>
+                <span class="material-symbols-outlined text-xs">chevron_right</span>
                 <a class="hover:text-primary" href="invoice-list.html">Invoices</a>
                 <span class="material-symbols-outlined text-xs">chevron_right</span>
-                <span class="text-slate-900 dark:text-white font-medium" data-invoice-number>INV-0</span>
-            </nav>
+                <span class="text-slate-900 dark:text-slate-100 font-medium">Invoice Details</span>
+            </div>
             <div class="flex items-center gap-4">
-                <h1 class="text-3xl font-extrabold tracking-tight">Invoice #<span data-invoice-number>INV-0</span></h1>
-                <span class="px-3 py-1 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-full text-xs font-bold uppercase tracking-wider" data-invoice-status>Pending</span>
-            </div>
-        </div>
-        <div class="flex flex-wrap items-center gap-3 no-print">
-            <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
-                <span class="material-symbols-outlined">download</span>
-                Download PDF
-            </button>
-            <button onclick="navigateToUpdateInvoice()" class="flex items-center gap-2 px-6 py-2 bg-primary text-white rounded-lg text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all">
-                <span class="material-symbols-outlined">edit</span>
-                Update Invoice
-            </button>
-        </div>
-    </div>
-    <!-- Tabbed Interface -->
-    <div class="border-b border-slate-200 dark:border-slate-800 mb-8 no-print">
-        <div class="flex gap-8">
-            <button class="pb-4 text-sm font-bold text-primary border-b-2 border-primary">
-                Invoice Details
-            </button>
-            <button class="pb-4 text-sm font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 border-b-2 border-transparent">
-                Activity History
-            </button>
-        </div>
-    </div>
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Left Column: Main Details -->
-        <div class="lg:col-span-2 space-y-8">
-            <!-- Client Info Card -->
-            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30">
-                    <h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                        <span class="material-symbols-outlined text-primary">person</span>
-                        Client &amp; Billing Information
-                    </h3>
-                </div>
-                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Bill From</label>
-                        <div class="space-y-1">
-                            <p class="font-bold text-slate-900 dark:text-white text-lg" data-bill-from-name>Company Name</p>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm" data-bill-from-email>company@email.com</p>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm" data-bill-from-phone>+94 77 665 4848</p>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm" data-bill-from-address>Address</p>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Bill To</label>
-                        <div class="space-y-1">
-                            <p class="font-bold text-slate-900 dark:text-white text-lg underline decoration-primary/30 underline-offset-4" data-bill-to-name>Client Name</p>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm italic" data-bill-to-email>client@email.com</p>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm" data-bill-to-phone>+94 71 223 4567</p>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm" data-bill-to-address>Client Address</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Itemized Table Card -->
-            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                    <h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                        <span class="material-symbols-outlined text-primary">list_alt</span>
-                        Line Items
-                    </h3>
-                    <button class="flex items-center gap-1 text-xs font-bold text-primary px-3 py-1.5 bg-primary/10 rounded-lg hover:bg-primary/20 transition-colors no-print">
-                        <span class="material-symbols-outlined text-sm">add</span> Add Item
-                    </button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="bg-slate-50 dark:bg-slate-800/50">
-                        <tr>
-                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Description</th>
-                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Qty</th>
-                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Unit Price</th>
-                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Total</th>
-                            <th class="px-6 py-4 w-12"></th>
-                        </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                        <!-- Line items will be populated dynamically by JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <!-- Right Column: Summary & Sidebar -->
-        <div class="space-y-8">
-            <!-- Financial Summary -->
-            <div class="bg-primary text-white rounded-xl shadow-xl shadow-primary/20 p-8">
-                <h3 class="text-xs font-bold uppercase tracking-widest opacity-70 mb-6">Financial Summary</h3>
-                <div class="space-y-4">
-                    <div class="flex justify-between text-xl">
-                        <span class="opacity-80">Total Amount</span>
-                        <span class="font-bold" data-total-amount>$0.00</span>
-                    </div>
-                </div>
-            </div>
-            <!-- Details Sidebar -->
-            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 space-y-6">
-                <div class="space-y-4">
-                    <div class="flex items-center gap-3">
-                        <div class="size-10 rounded-lg bg-background-light dark:bg-slate-800 flex items-center justify-center text-slate-500">
-                            <span class="material-symbols-outlined">calendar_today</span>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase">Issued Date</p>
-                            <p class="text-sm font-bold" data-issue-date>N/A</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <div class="size-10 rounded-lg bg-background-light dark:bg-slate-800 flex items-center justify-center text-slate-500">
-                            <span class="material-symbols-outlined">payments</span>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase">Payment Method</p>
-                            <p class="text-sm font-bold">Bank Transfer (ACH)</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Activity Feed -->
-            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 no-print">
-                <h4 class="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-widest mb-6">Recent Activity</h4>
-                <div class="relative space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100 dark:before:bg-slate-800">
-                    <!-- Log Item 1 -->
-                    <div class="relative flex gap-4 pl-8">
-                        <div class="absolute left-0 top-0 size-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center z-10">
-                            <div class="size-2 rounded-full bg-green-500"></div>
-                        </div>
-                        <div>
-                            <p class="text-xs font-bold text-slate-900 dark:text-white">Sent to Client</p>
-                            <p class="text-[10px] text-slate-500">Oct 25, 2023 • 10:45 AM</p>
-                        </div>
-                    </div>
-                    <!-- Log Item 2 -->
-                    <div class="relative flex gap-4 pl-8">
-                        <div class="absolute left-0 top-0 size-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center z-10">
-                            <div class="size-2 rounded-full bg-blue-500"></div>
-                        </div>
-                        <div>
-                            <p class="text-xs font-bold text-slate-900 dark:text-white">Invoice Created</p>
-                            <p class="text-[10px] text-slate-500">Oct 24, 2023 • 03:12 PM</p>
-                            <p class="text-[10px] text-slate-400 mt-1">By Sarah Jenkins</p>
-                        </div>
-                    </div>
-                </div>
-                <button class="w-full mt-6 py-2 text-xs font-bold text-slate-500 hover:text-primary transition-colors border border-dashed border-slate-200 dark:border-slate-800 rounded-lg">
-                    View Full History
+                <button class="size-10 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">
+                    <span class="material-symbols-outlined">search</span>
+                </button>
+                <button class="size-10 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 relative">
+                    <span class="material-symbols-outlined">notifications</span>
+                    <span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
                 </button>
             </div>
+        </header>
+        <div class="p-8 max-w-7xl mx-auto">
+            <!-- Breadcrumbs & Actions -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                <div>
+                    <nav class="flex items-center gap-2 text-sm text-slate-500 mb-2 no-print">
+                        <a class="hover:text-primary" href="invoice-list.html">Invoices</a>
+                        <span class="material-symbols-outlined text-xs">chevron_right</span>
+                        <span class="text-slate-900 dark:text-white font-medium" data-invoice-number>INV-0</span>
+                    </nav>
+                    <div class="flex items-center gap-4">
+                        <h1 class="text-3xl font-extrabold tracking-tight">Invoice #<span data-invoice-number>INV-0</span></h1>
+                        <span class="px-3 py-1 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-full text-xs font-bold uppercase tracking-wider" data-invoice-status>Pending</span>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-3 no-print">
+                    <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+                        <span class="material-symbols-outlined">download</span>
+                        Download PDF
+                    </button>
+                    <button onclick="navigateToUpdateInvoice()" class="flex items-center gap-2 px-6 py-2 bg-primary text-white rounded-lg text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all">
+                        <span class="material-symbols-outlined">edit</span>
+                        Update Invoice
+                    </button>
+                </div>
+            </div>
+            <!-- Tabbed Interface -->
+            <div class="border-b border-slate-200 dark:border-slate-800 mb-8 no-print">
+                <div class="flex gap-8">
+                    <button class="pb-4 text-sm font-bold text-primary border-b-2 border-primary">
+                        Invoice Details
+                    </button>
+                    <button class="pb-4 text-sm font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 border-b-2 border-transparent">
+                        Activity History
+                    </button>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column: Main Details -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Client Info Card -->
+                    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                        <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30">
+                            <h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">person</span>
+                                Client &amp; Billing Information
+                            </h3>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Bill From</label>
+                                <div class="space-y-1">
+                                    <p class="font-bold text-slate-900 dark:text-white text-lg" data-bill-from-name>Company Name</p>
+                                    <p class="text-slate-600 dark:text-slate-400 text-sm" data-bill-from-email>company@email.com</p>
+                                    <p class="text-slate-600 dark:text-slate-400 text-sm" data-bill-from-phone>+94 77 665 4848</p>
+                                    <p class="text-slate-600 dark:text-slate-400 text-sm" data-bill-from-address>Address</p>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Bill To</label>
+                                <div class="space-y-1">
+                                    <p class="font-bold text-slate-900 dark:text-white text-lg underline decoration-primary/30 underline-offset-4" data-bill-to-name>Client Name</p>
+                                    <p class="text-slate-600 dark:text-slate-400 text-sm italic" data-bill-to-email>client@email.com</p>
+                                    <p class="text-slate-600 dark:text-slate-400 text-sm" data-bill-to-phone>+94 71 223 4567</p>
+                                    <p class="text-slate-600 dark:text-slate-400 text-sm" data-bill-to-address>Client Address</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Itemized Table Card -->
+                    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                        <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                            <h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">list_alt</span>
+                                Line Items
+                            </h3>
+                            <button class="flex items-center gap-1 text-xs font-bold text-primary px-3 py-1.5 bg-primary/10 rounded-lg hover:bg-primary/20 transition-colors no-print">
+                                <span class="material-symbols-outlined text-sm">add</span> Add Item
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-slate-50 dark:bg-slate-800/50">
+                                <tr>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Description</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Qty</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Unit Price</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Total</th>
+                                    <th class="px-6 py-4 w-12"></th>
+                                </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                                <!-- Line items will be populated dynamically by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- Right Column: Summary & Sidebar -->
+                <div class="space-y-8">
+                    <!-- Financial Summary -->
+                    <div class="bg-primary text-white rounded-xl shadow-xl shadow-primary/20 p-8">
+                        <h3 class="text-xs font-bold uppercase tracking-widest opacity-70 mb-6">Financial Summary</h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between text-xl">
+                                <span class="opacity-80">Total Amount</span>
+                                <span class="font-bold" data-total-amount>LKR 0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Details Sidebar -->
+                    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 space-y-6">
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-3">
+                                <div class="size-10 rounded-lg bg-background-light dark:bg-slate-800 flex items-center justify-center text-slate-500">
+                                    <span class="material-symbols-outlined">calendar_today</span>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">Issued Date</p>
+                                    <p class="text-sm font-bold" data-issue-date>N/A</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="size-10 rounded-lg bg-background-light dark:bg-slate-800 flex items-center justify-center text-slate-500">
+                                    <span class="material-symbols-outlined">payments</span>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">Payment Method</p>
+                                    <p class="text-sm font-bold">Bank Transfer</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-</main>
+    </main>
+</div>
 <!-- Success Notification (Simulation) -->
 <div class="fixed bottom-8 right-8 flex items-center gap-4 bg-slate-900 text-white px-6 py-4 rounded-xl shadow-2xl animate-bounce pointer-events-none opacity-0 transition-opacity">
     <span class="material-symbols-outlined text-green-400">check_circle</span>

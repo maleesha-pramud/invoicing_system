@@ -447,7 +447,7 @@ function updateInvoiceList(invoices) {
 
     row.innerHTML = '<td class="px-6 py-4 font-semibold text-slate-900 dark:text-white">' + invoice.id + '</td>' +
                     '<td class="px-6 py-4 text-slate-600 dark:text-slate-400">' + (invoice.clientName || 'N/A') + '</td>' +
-                    '<td class="px-6 py-4 text-slate-600 dark:text-slate-400">$' + invoice.totalAmount.toFixed(2) + '</td>' +
+                    '<td class="px-6 py-4 text-slate-600 dark:text-slate-400">LKR ' + invoice.totalAmount.toFixed(2) + '</td>' +
                     '<td class="px-6 py-4 text-slate-600 dark:text-slate-400">' + invoice.date + '</td>' +
                     '<td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs font-semibold ' + statusClass + '">' + (invoice.status || 'DRAFT') + '</span></td>' +
                     '<td class="px-6 py-4 text-right space-x-2">' +
@@ -515,7 +515,7 @@ function populateServiceDropdown(services) {
     services.forEach(function(service) {
       var option = document.createElement('option');
       option.value = service.id;
-      option.textContent = service.name + ' - $' + (service.unitPrice || service.rate || 0).toFixed(2);
+      option.textContent = service.name + ' - LKR ' + (service.unitPrice || service.rate || 0).toFixed(2);
       select.appendChild(option);
     });
   });
@@ -535,7 +535,7 @@ function fillServiceSelect(selectEl) {
     var option = document.createElement('option');
     option.value = service.id;
     option.setAttribute('data-price', service.unitPrice || service.rate || 0);
-    option.textContent = service.name + ' ($' + (service.unitPrice || service.rate || 0).toFixed(2) + ')';
+    option.textContent = service.name + ' (LKR ' + (service.unitPrice || service.rate || 0).toFixed(2) + ')';
     selectEl.appendChild(option);
   });
 }
@@ -589,7 +589,7 @@ function addItemRow() {
   tdAmount.className = 'px-6 py-3 text-right';
   var amountSpan = document.createElement('span');
   amountSpan.className = 'item-amount text-sm font-semibold text-slate-900 dark:text-white';
-  amountSpan.textContent = '$0.00';
+  amountSpan.textContent = 'LKR 0.00';
   tdAmount.appendChild(amountSpan);
 
   var tdDelete = document.createElement('td');
@@ -622,7 +622,7 @@ function updateRowAmount(row) {
     var qty = parseInt(qtyInput.value) || 0;
     var rate = parseFloat(rateInput.value) || 0;
     var amount = qty * rate;
-    amountSpan.textContent = '$' + amount.toFixed(2);
+    amountSpan.textContent = 'LKR ' + amount.toFixed(2);
     recalcTotal();
   }
 }
@@ -634,10 +634,10 @@ function recalcTotal() {
   document.querySelectorAll('tr.invoice-item-row').forEach(function(row) {
     var amountSpan = row.querySelector('.item-amount');
     if (amountSpan) {
-      total += parseFloat(amountSpan.textContent.replace('$', '')) || 0;
+      total += parseFloat(amountSpan.textContent.replace('LKR ', '').replace(',', '')) || 0;
     }
   });
-  totalElement.textContent = '$' + total.toFixed(2);
+  totalElement.textContent = 'LKR ' + total.toFixed(2);
 }
 
 function populateInvoiceView(invoice) {
@@ -662,7 +662,7 @@ function populateInvoiceView(invoice) {
 
   // Update total amount in sidebar
   var totalAmountEl = document.querySelector('[data-total-amount]');
-  if (totalAmountEl) totalAmountEl.textContent = '$' + (invoice.totalAmount || 0).toFixed(2);
+  if (totalAmountEl) totalAmountEl.textContent = 'LKR ' + (invoice.totalAmount || 0).toFixed(2);
 
   // Support both nested client object and flat clientName
   var clientName = (invoice.client && invoice.client.name) ? invoice.client.name : (invoice.clientName || '');
@@ -700,8 +700,8 @@ function populateInvoiceItems(items) {
                     '  <div class="text-sm font-bold text-slate-900 dark:text-white">' + (item.serviceName || item.description || 'N/A') + '</div>' +
                     '</td>' +
                     '<td class="px-6 py-4 text-center text-sm">' + (item.quantity || 0) + '</td>' +
-                    '<td class="px-6 py-4 text-right text-sm font-medium">$' + unitPrice.toFixed(2) + '</td>' +
-                    '<td class="px-6 py-4 text-right text-sm font-bold">$' + itemTotal.toFixed(2) + '</td>' +
+                    '<td class="px-6 py-4 text-right text-sm font-medium">LKR ' + unitPrice.toFixed(2) + '</td>' +
+                    '<td class="px-6 py-4 text-right text-sm font-bold">LKR ' + itemTotal.toFixed(2) + '</td>' +
                     '<td class="px-6 py-4 text-right"></td>';
 
     tableBody.appendChild(row);
@@ -710,7 +710,7 @@ function populateInvoiceItems(items) {
   // Update total amount display
   var totalElement = document.querySelector('[data-total-amount]');
   if (totalElement) {
-    totalElement.textContent = '$' + totalAmount.toFixed(2);
+    totalElement.textContent = 'LKR ' + totalAmount.toFixed(2);
   }
 }
 
@@ -808,7 +808,7 @@ function submitUpdateInvoice() {
   // Calculate total amount from displayed amounts
   var totalAmount = 0;
   document.querySelectorAll('tr.invoice-item-row .item-amount').forEach(function(span) {
-    totalAmount += parseFloat(span.textContent.replace('$', '')) || 0;
+    totalAmount += parseFloat(span.textContent.replace('LKR ', '').replace(',', '')) || 0;
   });
 
   var invoiceData = {
@@ -948,7 +948,7 @@ function addItemRowWithData(itemData) {
   tdAmount.className = 'px-6 py-3 text-right';
   var amountSpan = document.createElement('span');
   amountSpan.className = 'item-amount text-sm font-semibold text-slate-900 dark:text-white';
-  amountSpan.textContent = '$' + ((itemData.quantity || 1) * (itemData.unitPrice || 0)).toFixed(2);
+  amountSpan.textContent = 'LKR ' + ((itemData.quantity || 1) * (itemData.unitPrice || 0)).toFixed(2);
   tdAmount.appendChild(amountSpan);
 
   var tdDelete = document.createElement('td');
@@ -1006,7 +1006,7 @@ function submitCreateInvoice() {
   // Calculate total amount from displayed amounts
   var totalAmount = 0;
   document.querySelectorAll('tr.invoice-item-row .item-amount').forEach(function(span) {
-    totalAmount += parseFloat(span.textContent.replace('$', '')) || 0;
+    totalAmount += parseFloat(span.textContent.replace('LKR ', '').replace(',', '')) || 0;
   });
 
   var invoiceData = {

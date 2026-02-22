@@ -42,167 +42,218 @@
         }
     </style>
 </head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
-<div class="layout-container flex h-full grow flex-col">
-    <!-- Top Navigation Bar -->
-    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 lg:px-10 py-3 sticky top-0 z-50">
-        <div class="flex items-center gap-4 text-slate-900 dark:text-white">
-            <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
-                <span class="material-symbols-outlined">receipt_long</span>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col fixed h-full">
+        <div class="p-6 flex items-center gap-3">
+            <div class="size-10 bg-primary rounded-lg flex items-center justify-center text-white">
+                <span class="material-symbols-outlined">payments</span>
             </div>
-            <h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight">InvoiceManager</h2>
+            <div>
+                <h1 class="text-lg font-bold leading-none">FinancePro</h1>
+                <p class="text-xs text-slate-500 mt-1">Admin Dashboard</p>
+            </div>
         </div>
-        <div class="flex flex-1 justify-end gap-6 items-center">
-            <nav class="hidden md:flex items-center gap-8">
-                <a class="text-primary text-sm font-semibold transition-colors" href="invoice-list.html">Invoices</a>
-            </nav>
-            <div class="h-8 w-px bg-slate-200 dark:bg-slate-800 hidden md:block"></div>
+        <nav class="flex-1 px-4 space-y-1 mt-4">
+            <a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="dashboard.html">
+                <span class="material-symbols-outlined">grid_view</span>
+                <span class="text-sm font-medium">Dashboard</span>
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2.5 bg-primary/10 text-primary rounded-lg transition-colors" href="invoice-list.html">
+                <span class="material-symbols-outlined">description</span>
+                <span class="text-sm font-medium">Invoices</span>
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+                <span class="material-symbols-outlined">group</span>
+                <span class="text-sm font-medium">Clients</span>
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+                <span class="material-symbols-outlined">analytics</span>
+                <span class="text-sm font-medium">Reports</span>
+            </a>
+            <div class="pt-4 pb-2">
+                <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">Support</p>
+            </div>
+            <a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="text-sm font-medium">Settings</span>
+            </a>
+            <a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+                <span class="material-symbols-outlined">help</span>
+                <span class="text-sm font-medium">Help Center</span>
+            </a>
+        </nav>
+        <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+            <div class="flex items-center gap-3 px-2 py-2">
+                <div class="size-9 rounded-full bg-slate-200 overflow-hidden">
+                    <img alt="User Profile" class="w-full h-full object-cover" data-alt="Professional male corporate user profile photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9g7YHNAy5OQ69FVynj1pLCxvmA5HW72YP_i8S-TEOSViwxy0xE2htJ1bpOoffqa9BUhCaPdX5Tfbb1mX0DMGihoKMATEioDIJVCIlCXynhEvjQv7goeERZt-9cngaZgo02D1SXLXx5cfYsJr5ff26-1mGFFthjIYuTiInAXTPagWy2X5GcbV0XiCUAE6dmdOE5DOUTdIcGGoFfhLEtAqFER9d_BE_C1lnTqxsSef0Gs8JMCWGNzOryQrvqwTFnYVt60w3J5cY5PU"/>
+                </div>
+                <div class="flex-1 overflow-hidden">
+                    <p class="text-sm font-semibold truncate">Maleesha Pramud</p>
+                    <p class="text-xs text-slate-500 truncate">Billing Manager</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+    <!-- Main Content -->
+    <main class="flex-1 ml-64">
+        <!-- Header -->
+        <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 sticky top-0 z-10">
+            <div class="flex items-center gap-2 text-sm text-slate-500">
+                <a class="hover:text-primary" href="dashboard.html">Home</a>
+                <span class="material-symbols-outlined text-xs">chevron_right</span>
+                <a class="hover:text-primary" href="invoice-list.html">Invoices</a>
+                <span class="material-symbols-outlined text-xs">chevron_right</span>
+                <span class="text-slate-900 dark:text-slate-100 font-medium">Update Invoice</span>
+            </div>
             <div class="flex items-center gap-4">
-                <button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
-                    <span class="material-symbols-outlined">notifications</span>
+                <button class="size-10 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">
+                    <span class="material-symbols-outlined">search</span>
                 </button>
-                <div class="bg-slate-200 dark:bg-slate-700 rounded-full size-9 overflow-hidden border border-slate-200 dark:border-slate-800">
-                    <img alt="User Profile" class="w-full h-full object-cover" data-alt="Professional user profile avatar photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuCEU1B_eY5uWXJ652N2eLQLXGZujzOvbyqjMpJdkTObt_-qdsYIJ90MU4_Aa5dv3Lfpt6ZWYnZglTiyqwHshDfT6VEe4PqeEGBZdChGz8ZUZFMwUiMjRXp5EaasfQ_W78iBZ238KjbcgWn6rFTnl7CnZDLrE3vLhnVJzfv0U1KonBZvOuHzThlr5tNEd_Sw2gfd3_r_mUi_NL3h_S8Il19wfGjsIPvhMVxiORzffiMiYXDbl_urSmVXNKmi1kMl2fV63B7oe_JVE"/>
-                </div>
+                <button class="size-10 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 relative">
+                    <span class="material-symbols-outlined">notifications</span>
+                    <span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+                </button>
             </div>
-        </div>
-    </header>
-    <main class="flex-1 flex justify-center py-8 px-4 md:px-10">
-        <div class="max-w-5xl w-full space-y-8">
-            <!-- Page Header Actions -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 class="text-slate-900 dark:text-white text-3xl font-extrabold tracking-tight">Update Invoice #<span id="invoiceNumber">...</span></h1>
-                    <p class="text-slate-500 dark:text-slate-400 mt-1">Modify invoice details and line items.</p>
+        </header>
+        <div class="p-8 max-w-7xl mx-auto">
+            <div class="max-w-5xl w-full mx-auto space-y-8">
+                <!-- Page Header Actions -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h1 class="text-slate-900 dark:text-white text-3xl font-extrabold tracking-tight">Update Invoice #<span id="invoiceNumber">...</span></h1>
+                        <p class="text-slate-500 dark:text-slate-400 mt-1">Modify invoice details and line items.</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="history.back()" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+                            <span class="material-symbols-outlined text-lg">arrow_back</span>
+                            Back
+                        </button>
+                    </div>
                 </div>
-                <div class="flex gap-3">
-                    <button onclick="history.back()" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
-                        <span class="material-symbols-outlined text-lg">arrow_back</span>
-                        Back
-                    </button>
-                </div>
-            </div>
-            <!-- Form Layout -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Left Column: Form Details -->
-                <div class="lg:col-span-2 space-y-6">
-                    <!-- Section 1: Client Information -->
-                    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
-                        <div class="flex items-center gap-2 mb-6 text-primary">
-                            <span class="material-symbols-outlined">person</span>
-                            <h3 class="text-slate-900 dark:text-white text-lg font-bold">1. Client Information</h3>
-                        </div>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Select Client</label>
-                                <div class="relative">
-                                    <select name="clientSelect" class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4 appearance-none">
-                                        <option value="">Search or select an existing client</option>
-                                    </select>
-                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
-                                        <span class="material-symbols-outlined">expand_more</span>
+                <!-- Form Layout -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Left Column: Form Details -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- Section 1: Client Information -->
+                        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+                            <div class="flex items-center gap-2 mb-6 text-primary">
+                                <span class="material-symbols-outlined">person</span>
+                                <h3 class="text-slate-900 dark:text-white text-lg font-bold">1. Client Information</h3>
+                            </div>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Select Client</label>
+                                    <div class="relative">
+                                        <select name="clientSelect" class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4 appearance-none">
+                                            <option value="">Search or select an existing client</option>
+                                        </select>
+                                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+                                            <span class="material-symbols-outlined">expand_more</span>
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Client Email</label>
+                                        <input class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4" placeholder="email@example.com" type="email" readonly/>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Client Phone</label>
+                                        <input class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4" placeholder="+1 (555) 000-0000" type="tel" readonly/>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Billing Address</label>
+                                    <textarea class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4 resize-none" placeholder="Street Address, City, State, ZIP, Country" rows="2" readonly></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Section 2: Invoice Details -->
+                        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+                            <div class="flex items-center gap-2 mb-6 text-primary">
+                                <span class="material-symbols-outlined">description</span>
+                                <h3 class="text-slate-900 dark:text-white text-lg font-bold">2. Invoice Details</h3>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Client Email</label>
-                                    <input class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4" placeholder="email@example.com" type="email" readonly/>
+                                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Invoice Status</label>
+                                    <div class="relative">
+                                        <select id="statusSelect" class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4 appearance-none">
+                                            <option value="1">Paid</option>
+                                            <option value="2">Pending</option>
+                                        </select>
+                                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+                                            <span class="material-symbols-outlined">expand_more</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Client Phone</label>
-                                    <input class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4" placeholder="+1 (555) 000-0000" type="tel" readonly/>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Billing Address</label>
-                                <textarea class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4 resize-none" placeholder="Street Address, City, State, ZIP, Country" rows="2" readonly></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Section 2: Invoice Details -->
-                    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
-                        <div class="flex items-center gap-2 mb-6 text-primary">
-                            <span class="material-symbols-outlined">description</span>
-                            <h3 class="text-slate-900 dark:text-white text-lg font-bold">2. Invoice Details</h3>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Invoice Status</label>
-                                <div class="relative">
-                                    <select id="statusSelect" class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4 appearance-none">
-                                        <option value="1">Paid</option>
-                                        <option value="2">Pending</option>
-                                    </select>
-                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
-                                        <span class="material-symbols-outlined">expand_more</span>
+                                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Issue Date</label>
+                                    <div class="relative">
+                                        <input id="issueDateInput" class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4" type="date" value="2026-02-22"/>
                                     </div>
                                 </div>
                             </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Issue Date</label>
-                                <div class="relative">
-                                    <input id="issueDateInput" class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4" type="date" value="2026-02-22"/>
+                        </div>
+                        <!-- Section 3: Itemized List -->
+                        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+                            <div class="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                                <div class="flex items-center gap-2 text-primary">
+                                    <span class="material-symbols-outlined">list_alt</span>
+                                    <h3 class="text-slate-900 dark:text-white text-lg font-bold">3. Itemized List</h3>
+                                </div>
+                                <button id="addRowBtn" type="button" class="text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1 transition-colors">
+                                    <span class="material-symbols-outlined text-lg">add</span>
+                                    Add Row
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left" id="itemsTable">
+                                    <thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs uppercase font-bold tracking-wider">
+                                    <tr>
+                                        <th class="px-6 py-4">Service</th>
+                                        <th class="px-6 py-4 w-24">Qty</th>
+                                        <th class="px-6 py-4 w-32">Unit Price</th>
+                                        <th class="px-6 py-4 w-32">Amount</th>
+                                        <th class="px-6 py-4 w-12"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="itemsTableBody" class="divide-y divide-slate-200 dark:divide-slate-800">
+                                    <!-- rows injected by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="p-6 bg-slate-50 dark:bg-slate-800/30">
+                                <button id="addRowBtn2" type="button" class="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg text-slate-500 hover:text-primary hover:border-primary transition-all font-medium">
+                                    <span class="material-symbols-outlined">add_circle</span>
+                                    Add another line item
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right Column: Summary & Actions -->
+                    <div class="space-y-6">
+                        <!-- Summary Card -->
+                        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm sticky top-24">
+                            <h3 class="text-slate-900 dark:text-white text-lg font-bold mb-6">4. Order Summary</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between text-slate-600 dark:text-slate-400 text-sm">
+                                    <span>Total Amount</span>
+                                    <span class="font-semibold text-slate-900 dark:text-white" data-total-amount>LKR 0.00</span>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <!-- Section 3: Itemized List -->
-                    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-                        <div class="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                            <div class="flex items-center gap-2 text-primary">
-                                <span class="material-symbols-outlined">list_alt</span>
-                                <h3 class="text-slate-900 dark:text-white text-lg font-bold">3. Itemized List</h3>
+                            <div class="mt-8 space-y-3">
+                                <button onclick="submitUpdateInvoice()" type="button" class="w-full py-4 bg-primary text-white rounded-lg font-bold shadow-lg shadow-primary/25 hover:bg-blue-700 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+                                    <span class="material-symbols-outlined text-xl">save</span>
+                                    Update Invoice
+                                </button>
+                                <button onclick="history.back()" class="w-full py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2">
+                                    <span class="material-symbols-outlined text-xl">cancel</span>
+                                    Cancel
+                                </button>
                             </div>
-                            <button id="addRowBtn" type="button" class="text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1 transition-colors">
-                                <span class="material-symbols-outlined text-lg">add</span>
-                                Add Row
-                            </button>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left" id="itemsTable">
-                                <thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs uppercase font-bold tracking-wider">
-                                <tr>
-                                    <th class="px-6 py-4">Service</th>
-                                    <th class="px-6 py-4 w-24">Qty</th>
-                                    <th class="px-6 py-4 w-32">Unit Price</th>
-                                    <th class="px-6 py-4 w-32">Amount</th>
-                                    <th class="px-6 py-4 w-12"></th>
-                                </tr>
-                                </thead>
-                                <tbody id="itemsTableBody" class="divide-y divide-slate-200 dark:divide-slate-800">
-                                <!-- rows injected by JS -->
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="p-6 bg-slate-50 dark:bg-slate-800/30">
-                            <button id="addRowBtn2" type="button" class="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg text-slate-500 hover:text-primary hover:border-primary transition-all font-medium">
-                                <span class="material-symbols-outlined">add_circle</span>
-                                Add another line item
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <!-- Right Column: Summary & Actions -->
-                <div class="space-y-6">
-                    <!-- Summary Card -->
-                    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm sticky top-24">
-                        <h3 class="text-slate-900 dark:text-white text-lg font-bold mb-6">4. Order Summary</h3>
-                        <div class="space-y-4">
-                            <div class="flex justify-between text-slate-600 dark:text-slate-400 text-sm">
-                                <span>Total Amount</span>
-                                <span class="font-semibold text-slate-900 dark:text-white" data-total-amount>$0.00</span>
-                            </div>
-                        </div>
-                        <div class="mt-8 space-y-3">
-                            <button onclick="submitUpdateInvoice()" type="button" class="w-full py-4 bg-primary text-white rounded-lg font-bold shadow-lg shadow-primary/25 hover:bg-blue-700 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
-                                <span class="material-symbols-outlined text-xl">save</span>
-                                Update Invoice
-                            </button>
-                            <button onclick="history.back()" class="w-full py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2">
-                                <span class="material-symbols-outlined text-xl">cancel</span>
-                                Cancel
-                            </button>
                         </div>
                     </div>
                 </div>
