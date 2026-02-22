@@ -2,6 +2,8 @@ package com.wigerlabs.invoicing_system.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "invoices")
@@ -14,33 +16,27 @@ public class Invoice {
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
-    @ManyToOne
-    @JoinColumn(name = "service_id", nullable = false)
-    private Service service;
-
     @Column(nullable = false)
     private LocalDate date;
 
     @Column(name = "total_amount", nullable = false)
     private double totalAmount;
 
-    @Column(nullable = false)
-    private int quantity;
-
     @ManyToOne
     @JoinColumn(name = "status_id", nullable = false)
     private Status status;
 
+    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<InvoiceItem> items = new ArrayList<>();
+
     public Invoice() {
     }
 
-    public Invoice(int id, Client client, Service service, LocalDate date, double totalAmount, int quantity, Status status) {
+    public Invoice(int id, Client client, LocalDate date, double totalAmount, Status status) {
         this.id = id;
         this.client = client;
-        this.service = service;
         this.date = date;
         this.totalAmount = totalAmount;
-        this.quantity = quantity;
         this.status = status;
     }
 
@@ -60,14 +56,6 @@ public class Invoice {
         this.client = client;
     }
 
-    public Service getService() {
-        return service;
-    }
-
-    public void setService(Service service) {
-        this.service = service;
-    }
-
     public LocalDate getDate() {
         return date;
     }
@@ -84,19 +72,24 @@ public class Invoice {
         this.totalAmount = totalAmount;
     }
 
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
     public Status getStatus() {
         return status;
     }
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public List<InvoiceItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<InvoiceItem> items) {
+        this.items = items;
+    }
+
+    public void addItem(InvoiceItem item) {
+        items.add(item);
+        item.setInvoice(this);
     }
 }

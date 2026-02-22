@@ -126,39 +126,6 @@
                     Create New Invoice
                 </button>
             </div>
-            <!-- Summary Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                    <div class="flex items-center justify-between mb-4">
-<span class="p-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-lg">
-<span class="material-symbols-outlined">pending_actions</span>
-</span>
-                        <span class="text-xs font-bold text-green-600 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded-full">+12.5%</span>
-                    </div>
-                    <p class="text-slate-500 text-sm font-medium">Total Outstanding</p>
-                    <h3 class="text-2xl font-bold mt-1">$12,450.00</h3>
-                </div>
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                    <div class="flex items-center justify-between mb-4">
-<span class="p-2 bg-green-50 dark:bg-green-900/30 text-green-600 rounded-lg">
-<span class="material-symbols-outlined">check_circle</span>
-</span>
-                        <span class="text-xs font-bold text-slate-500 bg-slate-50 dark:bg-slate-800 px-2 py-1 rounded-full">Last 30 days</span>
-                    </div>
-                    <p class="text-slate-500 text-sm font-medium">Paid this Month</p>
-                    <h3 class="text-2xl font-bold mt-1">$8,200.00</h3>
-                </div>
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                    <div class="flex items-center justify-between mb-4">
-<span class="p-2 bg-red-50 dark:bg-red-900/30 text-red-600 rounded-lg">
-<span class="material-symbols-outlined">error</span>
-</span>
-                        <span class="text-xs font-bold text-red-600 bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded-full">+2%</span>
-                    </div>
-                    <p class="text-slate-500 text-sm font-medium">Overdue Total</p>
-                    <h3 class="text-2xl font-bold mt-1">$1,150.00</h3>
-                </div>
-            </div>
             <!-- Table Container -->
             <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <!-- Filters Bar -->
@@ -203,101 +170,8 @@
                         </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                        <!-- Row 1 -->
-                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
-                            <td class="px-6 py-4 font-semibold text-sm">INV-2023-042</td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="size-8 rounded bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">AC</div>
-                                    <span class="text-sm font-medium">Acme Corp</span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Oct 24, 2023</td>
-                            <td class="px-6 py-4 text-sm font-bold">$1,250.00</td>
-                            <td class="px-6 py-4">
-<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                                            Paid
-                                        </span>
-                            </td>
-                            <td class="px-6 py-4 text-right">
-                                <div class="flex items-center justify-end gap-1">
-                                    <button class="p-2 text-slate-400 hover:text-primary transition-colors" title="View Detail">
-                                        <span class="material-symbols-outlined">visibility</span>
-                                    </button>
-                                    <button class="p-2 text-slate-400 hover:text-red-500 transition-colors" title="Delete">
-                                        <span class="material-symbols-outlined">delete</span>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Row 2 -->
-                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
-                            <td class="px-6 py-4 font-semibold text-sm">INV-2023-043</td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="size-8 rounded bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">GT</div>
-                                    <span class="text-sm font-medium">Global Tech</span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Oct 21, 2023</td>
-                            <td class="px-6 py-4 text-sm font-bold">$3,420.50</td>
-                            <td class="px-6 py-4">
-<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-                                            Pending
-                                        </span>
-                            </td>
-                            <td class="px-6 py-4 text-right">
-                                <div class="flex items-center justify-end gap-1">
-                                    <button class="p-2 text-slate-400 hover:text-primary transition-colors" title="View Detail">
-                                        <span class="material-symbols-outlined">visibility</span>
-                                    </button>
-                                    <button class="p-2 text-slate-400 hover:text-red-500 transition-colors" title="Delete">
-                                        <span class="material-symbols-outlined">delete</span>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Row 3 -->
-                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
-                            <td class="px-6 py-4 font-semibold text-sm">INV-2023-044</td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="size-8 rounded bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">NS</div>
-                                    <span class="text-sm font-medium">Nova Soft</span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Oct 15, 2023</td>
-                            <td class="px-6 py-4 text-sm font-bold">$850.00</td>
-                            <td class="px-6 py-4">
-<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400">
-                                            Overdue
-                                        </span>
-                            </td>
-                            <td class="px-6 py-4 text-right">
-                                <div class="flex items-center justify-end gap-1">
-                                    <button class="p-2 text-slate-400 hover:text-primary transition-colors" title="View Detail">
-                                        <span class="material-symbols-outlined">visibility</span>
-                                    </button>
-                                    <button class="p-2 text-slate-400 hover:text-red-500 transition-colors" title="Delete">
-                                        <span class="material-symbols-outlined">delete</span>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Row 4 -->
-                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
-                            <td class="px-6 py-4 font-semibold text-sm">INV-2023-045</td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="size-8 rounded bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">BM</div>
-                                    <span class="text-sm font-medium">Blue Mountain</span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Oct 12, 2023</td>
-                            <td class="px-6 py-4 text-sm font-bold">$2,100.00</td>
-                            <td class="px-6 py-4">
-<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                                            Paid
+                        <!-- Invoices will be populated dynamically by JavaScript -->
+                        </tbody>
                                         </span>
                             </td>
                             <td class="px-6 py-4 text-right">
@@ -313,52 +187,8 @@
                         </tr>
                         <!-- Row 5 -->
                         <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
-                            <td class="px-6 py-4 font-semibold text-sm">INV-2023-046</td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="size-8 rounded bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">DS</div>
-                                    <span class="text-sm font-medium">Design Studio</span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Oct 10, 2023</td>
-                            <td class="px-6 py-4 text-sm font-bold">$4,800.00</td>
-                            <td class="px-6 py-4">
-<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-                                            Pending
-                                        </span>
-                            </td>
-                            <td class="px-6 py-4 text-right">
-                                <div class="flex items-center justify-end gap-1">
-                                    <button class="p-2 text-slate-400 hover:text-primary transition-colors" title="View Detail">
-                                        <span class="material-symbols-outlined">visibility</span>
-                                    </button>
-                                    <button class="p-2 text-slate-400 hover:text-red-500 transition-colors" title="Delete">
-                                        <span class="material-symbols-outlined">delete</span>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
                         </tbody>
                     </table>
-                </div>
-                <!-- Pagination -->
-                <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                    <p class="text-sm text-slate-500">Showing <span class="font-bold text-slate-900 dark:text-slate-100">1-5</span> of <span class="font-bold text-slate-900 dark:text-slate-100">42</span> invoices</p>
-                    <div class="flex gap-2">
-                        <button class="px-3 py-1.5 rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-medium disabled:opacity-50" disabled="">
-                            Previous
-                        </button>
-                        <div class="flex items-center gap-1">
-                            <button class="size-8 rounded bg-primary text-white text-sm font-bold">1</button>
-                            <button class="size-8 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium">2</button>
-                            <button class="size-8 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium">3</button>
-                            <span class="px-1 text-slate-400">...</span>
-                            <button class="size-8 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-medium">9</button>
-                        </div>
-                        <button class="px-3 py-1.5 rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-medium">
-                            Next
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>

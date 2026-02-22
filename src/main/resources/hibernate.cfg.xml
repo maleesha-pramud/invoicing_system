@@ -18,5 +18,6 @@
         <mapping class="com.wigerlabs.invoicing_system.entity.Service"/>
         <mapping class="com.wigerlabs.invoicing_system.entity.Status"/>
         <mapping class="com.wigerlabs.invoicing_system.entity.Invoice"/>
+        <mapping class="com.wigerlabs.invoicing_system.entity.InvoiceItem"/>
     </session-factory>
 </hibernate-configuration>

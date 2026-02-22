@@ -1,5 +1,8 @@
 const API_BASE_URL = '/invoicing_system/api';
 
+// Globally cached services list for populating row dropdowns
+var _cachedServices = [];
+
 function loadAllClients() {
   var xhr = new XMLHttpRequest();
 
@@ -164,21 +167,47 @@ function loadAllInvoices() {
 }
 
 function getInvoiceById(invoiceId) {
+  var invoiceIdNum = parseInt(invoiceId);
+  if (isNaN(invoiceIdNum) || invoiceIdNum <= 0) {
+    console.error("Invalid invoice ID");
+    return;
+  }
+
   var xhr = new XMLHttpRequest();
 
-  xhr.open("GET", API_BASE_URL + "/invoice/" + invoiceId, true);
+  xhr.open("GET", API_BASE_URL + "/invoice/" + invoiceIdNum, true);
   xhr.setRequestHeader("Content-Type", "application/json");
 
   xhr.onload = function() {
     if (xhr.status === 200) {
       try {
-        var data = JSON.parse(xhr.responseText);
-        console.log("Invoice details:", data);
-        populateInvoiceView(data.data || data);
+        var response = JSON.parse(xhr.responseText);
+        var invoice = response.data || response;
+        console.log("Invoice details:", invoice);
+
+        // Populate invoice view with full details including client data
+        if (invoice) {
+          populateInvoiceView(invoice);
+
+          // Populate invoice items
+          if (invoice.items && invoice.items.length > 0) {
+            populateInvoiceItems(invoice.items);
+          }
+
+          // Update date information
+          var issueDate = document.querySelector('[data-issue-date]');
+          if (issueDate) issueDate.textContent = invoice.date || 'N/A';
+        }
       } catch (error) {
         console.error("Error parsing invoice:", error);
       }
+    } else {
+      console.error("Error loading invoice. Status:", xhr.status);
     }
+  };
+
+  xhr.onerror = function() {
+    console.error("AJAX Error loading invoice");
   };
 
   xhr.send();
@@ -246,9 +275,15 @@ function deleteInvoice(invoiceId) {
     return;
   }
 
+  var invoiceIdNum = parseInt(invoiceId);
+  if (isNaN(invoiceIdNum) || invoiceIdNum <= 0) {
+    showNotification("Invalid invoice ID", "error");
+    return;
+  }
+
   var xhr = new XMLHttpRequest();
 
-  xhr.open("DELETE", API_BASE_URL + "/invoice/" + invoiceId, true);
+  xhr.open("DELETE", API_BASE_URL + "/invoice/" + invoiceIdNum, true);
   xhr.setRequestHeader("Content-Type", "application/json");
 
   xhr.onload = function() {
@@ -260,6 +295,11 @@ function deleteInvoice(invoiceId) {
       console.error("Error deleting invoice");
       showNotification("Error deleting invoice", "error");
     }
+  };
+
+  xhr.onerror = function() {
+    console.error("AJAX Error deleting invoice");
+    showNotification("Network error deleting invoice", "error");
   };
 
   xhr.send();
@@ -276,7 +316,14 @@ function loadAllServices() {
       try {
         var data = JSON.parse(xhr.responseText);
         console.log("Services loaded:", data);
-        populateServiceDropdown(data.data || data);
+        _cachedServices = data.data || data || [];
+        populateServiceDropdown(_cachedServices);
+
+        // On create-invoice page, add one initial row once services are ready
+        var tbody = document.getElementById('itemsTableBody');
+        if (tbody && tbody.children.length === 0) {
+          addItemRow();
+        }
       } catch (error) {
         console.error("Error parsing services:", error);
       }
@@ -381,31 +428,264 @@ function updateInvoiceList(invoices) {
   var tableBody = document.querySelector('table tbody');
   if (!tableBody) return;
 
-  console.log("Updating invoice list with:", invoices);
+  // Clear existing rows
+  tableBody.innerHTML = '';
+
+  if (!invoices || invoices.length === 0) {
+    tableBody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-slate-500">No invoices found</td></tr>';
+    return;
+  }
+
+  invoices.forEach(function(invoice) {
+    var row = document.createElement('tr');
+    row.className = 'border-b border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors';
+
+    var statusClass = invoice.status === 'PAID' ? 'bg-green-100 text-green-800' :
+                      invoice.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-slate-100 text-slate-800';
+
+    row.innerHTML = '<td class="px-6 py-4 font-semibold text-slate-900 dark:text-white">' + invoice.id + '</td>' +
+                    '<td class="px-6 py-4 text-slate-600 dark:text-slate-400">' + (invoice.clientName || 'N/A') + '</td>' +
+                    '<td class="px-6 py-4 text-slate-600 dark:text-slate-400">$' + invoice.totalAmount.toFixed(2) + '</td>' +
+                    '<td class="px-6 py-4 text-slate-600 dark:text-slate-400">' + invoice.date + '</td>' +
+                    '<td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs font-semibold ' + statusClass + '">' + (invoice.status || 'DRAFT') + '</span></td>' +
+                    '<td class="px-6 py-4 text-right space-x-2">' +
+                    '  <button title="View Detail" class="text-primary hover:bg-primary/10 px-3 py-1.5 rounded transition-colors inline-flex items-center gap-1">' +
+                    '    <span class="material-symbols-outlined text-lg">visibility</span>' +
+                    '  </button>' +
+                    '  <button title="Delete" class="text-red-500 hover:bg-red-50 px-3 py-1.5 rounded transition-colors inline-flex items-center gap-1">' +
+                    '    <span class="material-symbols-outlined text-lg">delete</span>' +
+                    '  </button>' +
+                    '</td>';
+
+    tableBody.appendChild(row);
+  });
+
+  // Reattach event listeners
+  attachInvoiceListeners();
+}
+
+function attachInvoiceListeners() {
+  var deleteButtons = document.querySelectorAll('button[title="Delete"]');
+  deleteButtons.forEach(function(btn) {
+    btn.onclick = function() {
+      var row = btn.closest('tr');
+      var invoiceId = row ? row.querySelector('td').textContent : '';
+      if (invoiceId) {
+        deleteInvoice(invoiceId);
+      }
+    };
+  });
+
+  var viewButtons = document.querySelectorAll('button[title="View Detail"]');
+  viewButtons.forEach(function(btn) {
+    btn.onclick = function() {
+      var row = btn.closest('tr');
+      var invoiceId = row ? row.querySelector('td').textContent : '';
+      if (invoiceId) {
+        window.location.href = 'invoice-view.html?id=' + invoiceId;
+      }
+    };
+  });
 }
 
 function populateServiceDropdown(services) {
+  _cachedServices = services || [];
+
+  // Fill any legacy service selects (dashboard, service management pages)
   var serviceSelects = document.querySelectorAll('select[name="service"], select.service-select');
   serviceSelects.forEach(function(select) {
-
     while (select.options.length > 1) {
       select.remove(1);
     }
-
     services.forEach(function(service) {
       var option = document.createElement('option');
       option.value = service.id;
-      option.textContent = service.name + ' - $' + service.rate;
+      option.textContent = service.name + ' - $' + (service.unitPrice || service.rate || 0).toFixed(2);
       select.appendChild(option);
     });
   });
+
+  // Refresh all invoice-item row dropdowns on create-invoice page
+  var rowSelects = document.querySelectorAll('select.item-service-select');
+  rowSelects.forEach(function(sel) {
+    var currentVal = sel.value;
+    fillServiceSelect(sel);
+    sel.value = currentVal;
+  });
+}
+
+// Populate a single <select> element with the cached service list
+function fillServiceSelect(selectEl) {
+  selectEl.innerHTML = '<option value="">-- Select Service --</option>';
+  _cachedServices.forEach(function(service) {
+    var option = document.createElement('option');
+    option.value = service.id;
+    option.setAttribute('data-price', service.unitPrice || service.rate || 0);
+    option.textContent = service.name + ' ($' + (service.unitPrice || service.rate || 0).toFixed(2) + ')';
+    selectEl.appendChild(option);
+  });
+}
+
+// Add a new item row to the create-invoice items table
+function addItemRow() {
+  var tbody = document.getElementById('itemsTableBody');
+  if (!tbody) return;
+
+  var tr = document.createElement('tr');
+  tr.className = 'invoice-item-row divide-slate-200 dark:divide-slate-800';
+
+  var serviceSelect = document.createElement('select');
+  serviceSelect.className = 'item-service-select form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-2 px-3 text-sm';
+  fillServiceSelect(serviceSelect);
+
+  var qtyInput = document.createElement('input');
+  qtyInput.type = 'number';
+  qtyInput.min = '1';
+  qtyInput.value = '1';
+  qtyInput.className = 'item-qty form-input w-full border-0 bg-transparent p-0 text-slate-900 dark:text-white focus:ring-0 text-sm';
+  qtyInput.placeholder = '1';
+
+  var rateSpan = document.createElement('span');
+  rateSpan.className = 'item-rate text-slate-700 dark:text-slate-300 font-medium text-sm';
+  rateSpan.textContent = '$0.00';
+
+  var amountSpan = document.createElement('span');
+  amountSpan.className = 'item-amount font-semibold text-slate-900 dark:text-white text-sm';
+  amountSpan.textContent = '$0.00';
+
+  function recalcRow() {
+    var selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+    var price = selectedOption ? parseFloat(selectedOption.getAttribute('data-price') || 0) : 0;
+    var qty = parseInt(qtyInput.value) || 0;
+    rateSpan.textContent = '$' + price.toFixed(2);
+    amountSpan.textContent = '$' + (price * qty).toFixed(2);
+    recalcTotal();
+  }
+
+  serviceSelect.addEventListener('change', recalcRow);
+  qtyInput.addEventListener('input', recalcRow);
+
+  var deleteBtn = document.createElement('button');
+  deleteBtn.type = 'button';
+  deleteBtn.className = 'text-slate-400 hover:text-red-500 transition-colors';
+  deleteBtn.innerHTML = '<span class="material-symbols-outlined text-lg">delete</span>';
+  deleteBtn.addEventListener('click', function() {
+    tr.remove();
+    recalcTotal();
+  });
+
+  tr.innerHTML = '';
+  var tdService = document.createElement('td');
+  tdService.className = 'px-6 py-3';
+  tdService.appendChild(serviceSelect);
+
+  var tdQty = document.createElement('td');
+  tdQty.className = 'px-6 py-3';
+  tdQty.appendChild(qtyInput);
+
+  var tdRate = document.createElement('td');
+  tdRate.className = 'px-6 py-3';
+  tdRate.appendChild(rateSpan);
+
+  var tdAmount = document.createElement('td');
+  tdAmount.className = 'px-6 py-3';
+  tdAmount.appendChild(amountSpan);
+
+  var tdDelete = document.createElement('td');
+  tdDelete.className = 'px-6 py-3 text-right';
+  tdDelete.appendChild(deleteBtn);
+
+  tr.appendChild(tdService);
+  tr.appendChild(tdQty);
+  tr.appendChild(tdRate);
+  tr.appendChild(tdAmount);
+  tr.appendChild(tdDelete);
+
+  tbody.appendChild(tr);
+}
+
+function recalcTotal() {
+  var totalElement = document.querySelector('[data-total-amount]');
+  if (!totalElement) return;
+  var total = 0;
+  document.querySelectorAll('tr.invoice-item-row').forEach(function(row) {
+    var amountSpan = row.querySelector('.item-amount');
+    if (amountSpan) {
+      total += parseFloat(amountSpan.textContent.replace('$', '')) || 0;
+    }
+  });
+  totalElement.textContent = '$' + total.toFixed(2);
 }
 
 function populateInvoiceView(invoice) {
   console.log("Populating invoice view:", invoice);
-  var invoiceNumber = document.querySelector('[data-invoice-number]');
-  if (invoiceNumber) {
-    invoiceNumber.textContent = 'INV-' + invoice.id;
+
+  // Update invoice number
+  var invoiceNumberElements = document.querySelectorAll('[data-invoice-number]');
+  invoiceNumberElements.forEach(function(el) {
+    el.textContent = 'INV-' + invoice.id;
+  });
+
+  // Update status badge
+  var statusEl = document.querySelector('[data-invoice-status]');
+  if (statusEl) statusEl.textContent = invoice.status || 'N/A';
+
+  // Update issue date
+  var issueDate = document.querySelector('[data-issue-date]');
+  if (issueDate) issueDate.textContent = invoice.date || 'N/A';
+
+  // Update total amount in sidebar
+  var totalAmountEl = document.querySelector('[data-total-amount]');
+  if (totalAmountEl) totalAmountEl.textContent = '$' + (invoice.totalAmount || 0).toFixed(2);
+
+  // Support both nested client object and flat clientName
+  var clientName = (invoice.client && invoice.client.name) ? invoice.client.name : (invoice.clientName || '');
+  var clientEmail = (invoice.client && invoice.client.email) ? invoice.client.email : '';
+  var clientPhone = (invoice.client && invoice.client.phone) ? invoice.client.phone : '';
+  var clientAddress = (invoice.client && invoice.client.address) ? invoice.client.address : '';
+
+  var billToName = document.querySelector('[data-bill-to-name]');
+  var billToEmail = document.querySelector('[data-bill-to-email]');
+  var billToPhone = document.querySelector('[data-bill-to-phone]');
+  var billToAddress = document.querySelector('[data-bill-to-address]');
+
+  if (billToName) billToName.textContent = clientName;
+  if (billToEmail) billToEmail.textContent = clientEmail;
+  if (billToPhone) billToPhone.textContent = clientPhone;
+  if (billToAddress) billToAddress.textContent = clientAddress;
+}
+
+function populateInvoiceItems(items) {
+  var tableBody = document.querySelector('table tbody');
+  if (!tableBody) return;
+
+  tableBody.innerHTML = '';
+
+  var totalAmount = 0;
+  items.forEach(function(item) {
+    var row = document.createElement('tr');
+    row.className = 'group hover:bg-slate-50/50 dark:hover:bg-slate-800/20';
+
+    var unitPrice = item.unitPrice || item.rate || 0;
+    var itemTotal = (item.quantity || 0) * unitPrice;
+    totalAmount += itemTotal;
+
+    row.innerHTML = '<td class="px-6 py-4">' +
+                    '  <div class="text-sm font-bold text-slate-900 dark:text-white">' + (item.serviceName || item.description || 'N/A') + '</div>' +
+                    '</td>' +
+                    '<td class="px-6 py-4 text-center text-sm">' + (item.quantity || 0) + '</td>' +
+                    '<td class="px-6 py-4 text-right text-sm font-medium">$' + unitPrice.toFixed(2) + '</td>' +
+                    '<td class="px-6 py-4 text-right text-sm font-bold">$' + itemTotal.toFixed(2) + '</td>' +
+                    '<td class="px-6 py-4 text-right"></td>';
+
+    tableBody.appendChild(row);
+  });
+
+  // Update total amount display
+  var totalElement = document.querySelector('[data-total-amount]');
+  if (totalElement) {
+    totalElement.textContent = '$' + totalAmount.toFixed(2);
   }
 }
 
@@ -446,86 +726,88 @@ function onClientSelectChange() {
 
 function submitCreateInvoice() {
   var clientSelect = document.querySelector('select[name="clientSelect"]');
-  var invoiceNumber = document.querySelector('input[value="2024-001"]');
-  var issueDate = document.querySelector('input[type="date"][value="2023-10-27"]');
-  var dueDate = document.querySelector('input[type="date"][value="2023-11-27"]');
+  var issueDateInput = document.querySelectorAll('input[type="date"]')[0];
 
   if (!clientSelect || !clientSelect.value) {
     showNotification("Please select a client", "error");
     return;
   }
 
+  // Collect items from table rows
   var items = [];
-  var rows = document.querySelectorAll('table tbody tr:not(:last-child)');
+  var rows = document.querySelectorAll('tr.invoice-item-row');
   rows.forEach(function(row) {
-    var descInput = row.querySelector('input[type="text"]');
-    var qtyInput = row.querySelector('input[type="number"][placeholder*="Qty"]') || row.querySelectorAll('input[type="number"]')[0];
-    var rateInput = row.querySelectorAll('input[type="number"]')[1];
+    var serviceSelect = row.querySelector('select.item-service-select');
+    var qtyInput = row.querySelector('input.item-qty');
 
-    if (descInput && descInput.value && qtyInput && rateInput) {
-      items.push({
-        description: descInput.value,
-        quantity: qtyInput.value,
-        rate: rateInput.value
-      });
+    var serviceId = serviceSelect ? parseInt(serviceSelect.value) : 0;
+    var qty = qtyInput ? parseInt(qtyInput.value) : 0;
+
+    if (serviceId > 0 && qty > 0) {
+      items.push({ serviceId: serviceId, quantity: qty });
     }
   });
 
   if (items.length === 0) {
-    showNotification("Please add at least one item", "error");
+    showNotification("Please add at least one service item", "error");
     return;
   }
 
+  // Calculate total amount from displayed amounts
+  var totalAmount = 0;
+  document.querySelectorAll('tr.invoice-item-row .item-amount').forEach(function(span) {
+    totalAmount += parseFloat(span.textContent.replace('$', '')) || 0;
+  });
+
   var invoiceData = {
-    clientId: clientSelect.value,
-    invoiceNumber: invoiceNumber ? invoiceNumber.value : 'INV-' + new Date().getTime(),
-    issueDate: issueDate ? issueDate.value : new Date().toISOString().split('T')[0],
-    dueDate: dueDate ? dueDate.value : new Date().toISOString().split('T')[0],
+    clientId: parseInt(clientSelect.value),
+    date: issueDateInput ? issueDateInput.value : new Date().toISOString().split('T')[0],
     items: items,
-    status: 'DRAFT'
+    totalAmount: totalAmount,
+    statusId: 1   // default to first status (e.g. Pending / Draft)
   };
 
+  console.log("Submitting invoice data:", invoiceData);
   createInvoice(invoiceData);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  loadAllClients();
-  loadAllServices();
-  loadAllInvoices();
+  // Check if we're on the invoice view page
+  var urlParams = new URLSearchParams(window.location.search);
+  var invoiceId = urlParams.get('id');
+
+  if (invoiceId) {
+    // Load invoice details on view page
+    getInvoiceById(invoiceId);
+  } else {
+    // Load data for create/list pages
+    loadAllClients();
+    loadAllServices();
+    loadAllInvoices();
+  }
 
   var clientSelect = document.querySelector('select[name="clientSelect"]');
   if (clientSelect) {
     clientSelect.addEventListener('change', onClientSelectChange);
   }
 
+  // Wire up Add Row buttons on create-invoice page
+  var addRowBtn = document.getElementById('addRowBtn');
+  if (addRowBtn) addRowBtn.addEventListener('click', addItemRow);
+
+  var addRowBtn2 = document.getElementById('addRowBtn2');
+  if (addRowBtn2) addRowBtn2.addEventListener('click', addItemRow);
+
   var sendInvoiceBtn = Array.from(document.querySelectorAll('button')).find(btn =>
     btn.querySelector('span') && btn.querySelector('span').textContent.includes('Send Invoice')
   ) || document.querySelector('button.btn-send-invoice');
 
-  var createNewInvoiceBtn = Array.from(document.querySelectorAll('button')).find(btn =>
-    btn.querySelector('span') && btn.querySelector('span').textContent.includes('Create New Invoice')
-  ) || document.querySelector('button.btn-create-invoice');
 
   if (sendInvoiceBtn) {
     sendInvoiceBtn.addEventListener('click', submitCreateInvoice);
   }
 
-  var deleteButtons = document.querySelectorAll('button[title="Delete"]');
-  deleteButtons.forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var row = btn.closest('tr');
-      var invoiceNumber = row ? row.querySelector('td').textContent : '';
-      deleteInvoice(invoiceNumber);
-    });
-  });
-
-  var viewButtons = document.querySelectorAll('button[title="View Detail"]');
-  viewButtons.forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var row = btn.closest('tr');
-      var invoiceNumber = row ? row.querySelector('td').textContent : '';
-      window.location.href = 'invoice-view.html?id=' + invoiceNumber;
-    });
-  });
+  // Attach event listeners for invoice list actions
+  attachInvoiceListeners();
 });
 
