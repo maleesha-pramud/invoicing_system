@@ -78,14 +78,14 @@ public class DataInitializationService {
 
                 // Create sample clients
                 Client[] clients = {
-                        new Client("Gamini Fernando", "gamini@gmail.com", "Rathnapura, Kaluthara, Uthura"),
-                        new Client("Jayasena Finance", "jayasena@gmail.com", "Kaluthara, Bo gaha mawatha"),
-                        new Client("Kasun Wijeweera", "kasun@gmail.com.com", "Uthuru Nuwara, Main Street, Uthura"),
-                        new Client("Navindu Jayanuwan", "navindu@gmail.com", "35, Colombo Road, Kaluthara"),
-                        new Client("Naditha Goshana", "nadisha@gmail.com", "Colombo 7, 557 Wihara Mawatha"),
-                        new Client("Sahan Gamage", "sahan@gmail.com", "55, Horana Road, Homagama"),
-                        new Client("Ravindu Bandara", "ravindu@gmail.com", "Pokunuwita Road, Galpatha"),
-                        new Client("Tharuka Penal", "tharuka@gmail.com", "67/8, Abagas Mawatha, Uthuru Kolaba")
+                        new Client("Gamini Fernando", "gamini@gmail.com", "Rathnapura, Kaluthara, Uthura", "0776654848"),
+                        new Client("Jayasena Finance", "jayasena@gmail.com", "Kaluthara, Bo gaha mawatha", "0701234567"),
+                        new Client("Kasun Wijeweera", "kasun@gmail.com.com", "Uthuru Nuwara, Main Street, Uthura", "0787654321"),
+                        new Client("Navindu Jayanuwan", "navindu@gmail.com", "35, Colombo Road, Kaluthara", "0712345678"),
+                        new Client("Naditha Goshana", "nadisha@gmail.com", "Colombo 7, 557 Wihara Mawatha", "0723456789"),
+                        new Client("Sahan Gamage", "sahan@gmail.com", "55, Horana Road, Homagama", "0734567890"),
+                        new Client("Ravindu Bandara", "ravindu@gmail.com", "Pokunuwita Road, Galpatha", "0745678901"),
+                        new Client("Tharuka Penal", "tharuka@gmail.com", "67/8, Abagas Mawatha, Uthuru Kolaba", "0756789012")
                 };
 
                 for (Client client : clients) {

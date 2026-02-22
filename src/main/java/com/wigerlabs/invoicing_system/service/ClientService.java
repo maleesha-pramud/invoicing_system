@@ -39,6 +39,7 @@ public class ClientService {
                 client.setName(clientDTO.getName());
                 client.setEmail(clientDTO.getEmail());
                 client.setAddress(clientDTO.getAddress());
+                client.setPhone(clientDTO.getPhone());
 
                 session.persist(client);
                 transaction.commit();
@@ -83,7 +84,8 @@ public class ClientService {
                     client.getId(),
                     client.getName(),
                     client.getEmail(),
-                    client.getAddress()
+                    client.getAddress(),
+                    client.getPhone()
                 );
                 clientDTOs.add(dto);
             }
@@ -127,7 +129,8 @@ public class ClientService {
                     client.getId(),
                     client.getName(),
                     client.getEmail(),
-                    client.getAddress()
+                    client.getAddress(),
+                    client.getPhone()
                 );
 
                 status = true;
@@ -189,6 +192,7 @@ public class ClientService {
                 client.setName(clientDTO.getName());
                 client.setEmail(clientDTO.getEmail());
                 client.setAddress(clientDTO.getAddress());
+                client.setPhone(clientDTO.getPhone());
 
                 session.merge(client);
                 transaction.commit();

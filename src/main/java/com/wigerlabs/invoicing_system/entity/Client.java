@@ -18,20 +18,25 @@ public class Client {
     @Column(length = 200, nullable = false)
     private String address;
 
+    @Column(length = 10, nullable = false)
+    private String phone;
+
     public Client() {
     }
 
-    public Client(String name, String email, String address) {
-        this.name = name;
-        this.email = email;
-        this.address = address;
-    }
-
-    public Client(int id, String name, String email, String address) {
+    public Client(int id, String name, String email, String address, String phone) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.address = address;
+        this.phone = phone;
+    }
+
+    public Client(String name, String email, String address, String phone) {
+        this.name = name;
+        this.email = email;
+        this.address = address;
+        this.phone = phone;
     }
 
     public int getId() {
@@ -64,5 +69,13 @@ public class Client {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }
