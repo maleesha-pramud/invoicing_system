@@ -545,9 +545,10 @@ function loadAllServices() {
         _cachedServices = data.data || data || [];
         populateServiceDropdown(_cachedServices);
 
-        // On create-invoice page, add one initial row once services are ready
+        // On create-invoice page only, add one initial row once services are ready
+        var currentPage = window.location.pathname.split('/').pop();
         var tbody = document.getElementById('itemsTableBody');
-        if (tbody && tbody.children.length === 0) {
+        if (tbody && tbody.children.length === 0 && currentPage === 'create-invoice.html') {
           addItemRow();
         }
 
@@ -699,8 +700,19 @@ function deleteService(serviceId) {
 }
 
 function updateInvoiceList(invoices) {
-  var tableBody = document.querySelector('table tbody');
-  if (!tableBody) return;
+  // Only target the invoice list table, not other tables on the page
+  var tableBody = document.querySelector('#invoiceListTable tbody');
+  if (!tableBody) {
+    // Fallback to generic selector only if specific table doesn't exist
+    tableBody = document.querySelector('table tbody');
+    if (!tableBody) return;
+
+    // Check if we're on update-invoice or create-invoice page - don't update those tables
+    var currentPage = window.location.pathname.split('/').pop();
+    if (currentPage === 'update-invoice.html' || currentPage === 'create-invoice.html') {
+      return;
+    }
+  }
 
   // Clear existing rows
   tableBody.innerHTML = '';
@@ -1095,6 +1107,15 @@ function submitUpdateInvoice() {
 }
 
 function loadInvoiceForUpdate(invoiceId) {
+  // Check if services are loaded, if not, wait and retry
+  if (!_cachedServices || _cachedServices.length === 0) {
+    console.log("Services not loaded yet, waiting...");
+    setTimeout(function() {
+      loadInvoiceForUpdate(invoiceId);
+    }, 200);
+    return;
+  }
+
   showLoadingOverlay('Loading invoice for update...');
 
   var xhr = new XMLHttpRequest();
@@ -1107,6 +1128,7 @@ function loadInvoiceForUpdate(invoiceId) {
       var invoice = response.data || response;
 
       console.log("Loaded invoice for update:", invoice);
+      console.log("Available services:", _cachedServices.length);
 
       // Store invoice globally
       window.currentInvoice = invoice;
@@ -1147,6 +1169,7 @@ function loadInvoiceForUpdate(invoiceId) {
 
       // Populate items
       if (invoice.items && invoice.items.length > 0) {
+        console.log("Populating " + invoice.items.length + " invoice items...");
         invoice.items.forEach(function(item) {
           addItemRowWithData(item);
         });
@@ -1179,7 +1202,13 @@ function loadInvoiceForUpdate(invoiceId) {
 
 function addItemRowWithData(itemData) {
   var tbody = document.getElementById('itemsTableBody');
-  if (!tbody) return;
+  if (!tbody) {
+    console.error("itemsTableBody not found!");
+    return;
+  }
+
+  console.log("Adding item row with data:", itemData);
+  console.log("Available services:", _cachedServices.length);
 
   var tr = document.createElement('tr');
   tr.className = 'invoice-item-row group hover:bg-slate-50 dark:hover:bg-slate-800/20';
@@ -1193,6 +1222,7 @@ function addItemRowWithData(itemData) {
   // Select the current service
   if (itemData.serviceId) {
     serviceSelect.value = itemData.serviceId;
+    console.log("Set service select value to:", itemData.serviceId);
   }
 
   serviceSelect.onchange = function() {
@@ -1335,10 +1365,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load data for update page
     loadAllClients();
     loadAllServices();
-    // Wait a bit for clients and services to load, then load invoice
-    setTimeout(function() {
-      loadInvoiceForUpdate(invoiceId);
-    }, 500);
+    // Load invoice (it will wait for services to be ready internally)
+    loadInvoiceForUpdate(invoiceId);
   } else {
     // Load data for create/list pages
     loadAllClients();
@@ -1383,7 +1411,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }, 800);
 });
 
-// Real-time form validation and feedback
 function setupRealTimeValidation() {
   // Validate client selection in real-time
   var clientSelect = document.querySelector('select[name="clientSelect"]');
@@ -1428,13 +1455,12 @@ function setupRealTimeValidation() {
   });
 }
 
-// Auto-save draft functionality (optional enhancement)
 var autoSaveDraftTimeout;
 function scheduleAutoSaveDraft() {
   clearTimeout(autoSaveDraftTimeout);
   autoSaveDraftTimeout = setTimeout(function() {
     saveDraftToLocalStorage();
-  }, 2000); // Auto-save after 2 seconds of inactivity
+  }, 2000);
 }
 
 function saveDraftToLocalStorage() {
@@ -1475,7 +1501,6 @@ function loadDraftFromLocalStorage() {
     try {
       var draftData = JSON.parse(draft);
       if (confirm("A draft invoice was found. Would you like to restore it?")) {
-        // Restore draft logic here
         showNotification("Draft restored", "success");
         localStorage.removeItem('invoiceDraft');
       }
@@ -1485,7 +1510,6 @@ function loadDraftFromLocalStorage() {
   }
 }
 
-// Enhanced status update with real-time feedback
 function updateInvoiceStatus(invoiceId, statusId) {
   showLoadingOverlay('Updating invoice status...');
 
@@ -1497,7 +1521,6 @@ function updateInvoiceStatus(invoiceId, statusId) {
     hideLoadingOverlay();
     if (xhr.status === 200) {
       showNotification("✓ Invoice status updated successfully!", "success");
-      // Reload current invoice if on view page
       var urlParams = new URLSearchParams(window.location.search);
       var currentInvoiceId = urlParams.get('id');
       if (currentInvoiceId) {
