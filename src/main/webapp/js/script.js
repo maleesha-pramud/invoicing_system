@@ -258,9 +258,10 @@ function updateInvoice(invoiceData) {
       console.log("Invoice updated successfully");
       showNotification("Invoice updated successfully!", "success");
 
-      if (invoiceData.id) {
-        getInvoiceById(invoiceData.id);
-      }
+      // Redirect to invoice view page after successful update
+      setTimeout(function() {
+        window.location.href = 'invoice-view.html?id=' + invoiceData.id;
+      }, 1500);
     } else {
       console.error("Error updating invoice");
       showNotification("Error updating invoice", "error");
@@ -453,6 +454,9 @@ function updateInvoiceList(invoices) {
                     '  <button title="View Detail" class="text-primary hover:bg-primary/10 px-3 py-1.5 rounded transition-colors inline-flex items-center gap-1">' +
                     '    <span class="material-symbols-outlined text-lg">visibility</span>' +
                     '  </button>' +
+                    '  <button title="Update Invoice" class="text-blue-500 hover:bg-blue-50 px-3 py-1.5 rounded transition-colors inline-flex items-center gap-1">' +
+                    '    <span class="material-symbols-outlined text-lg">edit</span>' +
+                    '  </button>' +
                     '  <button title="Delete" class="text-red-500 hover:bg-red-50 px-3 py-1.5 rounded transition-colors inline-flex items-center gap-1">' +
                     '    <span class="material-symbols-outlined text-lg">delete</span>' +
                     '  </button>' +
@@ -487,12 +491,22 @@ function attachInvoiceListeners() {
       }
     };
   });
+
+  var updateButtons = document.querySelectorAll('button[title="Update Invoice"]');
+  updateButtons.forEach(function(btn) {
+    btn.onclick = function() {
+      var row = btn.closest('tr');
+      var invoiceId = row ? row.querySelector('td').textContent : '';
+      if (invoiceId) {
+        window.location.href = 'update-invoice.html?id=' + invoiceId;
+      }
+    };
+  });
 }
 
 function populateServiceDropdown(services) {
   _cachedServices = services || [];
 
-  // Fill any legacy service selects (dashboard, service management pages)
   var serviceSelects = document.querySelectorAll('select[name="service"], select.service-select');
   serviceSelects.forEach(function(select) {
     while (select.options.length > 1) {
@@ -506,7 +520,6 @@ function populateServiceDropdown(services) {
     });
   });
 
-  // Refresh all invoice-item row dropdowns on create-invoice page
   var rowSelects = document.querySelectorAll('select.item-service-select');
   rowSelects.forEach(function(sel) {
     var currentVal = sel.value;
@@ -533,67 +546,62 @@ function addItemRow() {
   if (!tbody) return;
 
   var tr = document.createElement('tr');
-  tr.className = 'invoice-item-row divide-slate-200 dark:divide-slate-800';
+  tr.className = 'invoice-item-row group hover:bg-slate-50 dark:hover:bg-slate-800/20';
 
-  var serviceSelect = document.createElement('select');
-  serviceSelect.className = 'item-service-select form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-2 px-3 text-sm';
-  fillServiceSelect(serviceSelect);
-
-  var qtyInput = document.createElement('input');
-  qtyInput.type = 'number';
-  qtyInput.min = '1';
-  qtyInput.value = '1';
-  qtyInput.className = 'item-qty form-input w-full border-0 bg-transparent p-0 text-slate-900 dark:text-white focus:ring-0 text-sm';
-  qtyInput.placeholder = '1';
-
-  var rateSpan = document.createElement('span');
-  rateSpan.className = 'item-rate text-slate-700 dark:text-slate-300 font-medium text-sm';
-  rateSpan.textContent = '$0.00';
-
-  var amountSpan = document.createElement('span');
-  amountSpan.className = 'item-amount font-semibold text-slate-900 dark:text-white text-sm';
-  amountSpan.textContent = '$0.00';
-
-  function recalcRow() {
-    var selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
-    var price = selectedOption ? parseFloat(selectedOption.getAttribute('data-price') || 0) : 0;
-    var qty = parseInt(qtyInput.value) || 0;
-    rateSpan.textContent = '$' + price.toFixed(2);
-    amountSpan.textContent = '$' + (price * qty).toFixed(2);
-    recalcTotal();
-  }
-
-  serviceSelect.addEventListener('change', recalcRow);
-  qtyInput.addEventListener('input', recalcRow);
-
-  var deleteBtn = document.createElement('button');
-  deleteBtn.type = 'button';
-  deleteBtn.className = 'text-slate-400 hover:text-red-500 transition-colors';
-  deleteBtn.innerHTML = '<span class="material-symbols-outlined text-lg">delete</span>';
-  deleteBtn.addEventListener('click', function() {
-    tr.remove();
-    recalcTotal();
-  });
-
-  tr.innerHTML = '';
   var tdService = document.createElement('td');
   tdService.className = 'px-6 py-3';
+  var serviceSelect = document.createElement('select');
+  serviceSelect.className = 'item-service-select form-input w-full rounded border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm py-2';
+  fillServiceSelect(serviceSelect);
+
+  serviceSelect.onchange = function() {
+    var selectedService = _cachedServices.find(function(s) {
+      return s.id == serviceSelect.value;
+    });
+    if (selectedService) {
+      rateInput.value = (selectedService.unitPrice || selectedService.rate || 0).toFixed(2);
+      updateRowAmount(tr);
+    }
+  };
   tdService.appendChild(serviceSelect);
 
   var tdQty = document.createElement('td');
   tdQty.className = 'px-6 py-3';
+  var qtyInput = document.createElement('input');
+  qtyInput.type = 'number';
+  qtyInput.className = 'item-quantity form-input w-20 rounded border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm text-center py-2';
+  qtyInput.value = '1';
+  qtyInput.min = '1';
+  qtyInput.onchange = function() { updateRowAmount(tr); };
   tdQty.appendChild(qtyInput);
 
   var tdRate = document.createElement('td');
   tdRate.className = 'px-6 py-3';
-  tdRate.appendChild(rateSpan);
+  var rateInput = document.createElement('input');
+  rateInput.type = 'number';
+  rateInput.step = '0.01';
+  rateInput.className = 'item-rate form-input w-28 rounded border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm text-right py-2';
+  rateInput.value = '0.00';
+  rateInput.onchange = function() { updateRowAmount(tr); };
+  tdRate.appendChild(rateInput);
 
   var tdAmount = document.createElement('td');
-  tdAmount.className = 'px-6 py-3';
+  tdAmount.className = 'px-6 py-3 text-right';
+  var amountSpan = document.createElement('span');
+  amountSpan.className = 'item-amount text-sm font-semibold text-slate-900 dark:text-white';
+  amountSpan.textContent = '$0.00';
   tdAmount.appendChild(amountSpan);
 
   var tdDelete = document.createElement('td');
-  tdDelete.className = 'px-6 py-3 text-right';
+  tdDelete.className = 'px-6 py-3 text-center';
+  var deleteBtn = document.createElement('button');
+  deleteBtn.type = 'button';
+  deleteBtn.className = 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded transition-colors';
+  deleteBtn.innerHTML = '<span class="material-symbols-outlined text-lg">delete</span>';
+  deleteBtn.onclick = function() {
+    tr.remove();
+    recalcTotal();
+  };
   tdDelete.appendChild(deleteBtn);
 
   tr.appendChild(tdService);
@@ -603,6 +611,20 @@ function addItemRow() {
   tr.appendChild(tdDelete);
 
   tbody.appendChild(tr);
+}
+
+function updateRowAmount(row) {
+  var qtyInput = row.querySelector('.item-quantity');
+  var rateInput = row.querySelector('.item-rate');
+  var amountSpan = row.querySelector('.item-amount');
+
+  if (qtyInput && rateInput && amountSpan) {
+    var qty = parseInt(qtyInput.value) || 0;
+    var rate = parseFloat(rateInput.value) || 0;
+    var amount = qty * rate;
+    amountSpan.textContent = '$' + amount.toFixed(2);
+    recalcTotal();
+  }
 }
 
 function recalcTotal() {
@@ -620,6 +642,9 @@ function recalcTotal() {
 
 function populateInvoiceView(invoice) {
   console.log("Populating invoice view:", invoice);
+
+  // Store current invoice globally for update functionality
+  window.currentInvoice = invoice;
 
   // Update invoice number
   var invoiceNumberElements = document.querySelectorAll('[data-invoice-number]');
@@ -724,6 +749,231 @@ function onClientSelectChange() {
   }
 }
 
+function submitUpdateInvoice() {
+  var urlParams = new URLSearchParams(window.location.search);
+  var invoiceId = urlParams.get('id');
+
+  if (!invoiceId) {
+    showNotification("No invoice ID found", "error");
+    return;
+  }
+
+  var clientSelect = document.querySelector('select[name="clientSelect"]');
+  var issueDateInput = document.getElementById('issueDateInput');
+  var statusSelect = document.getElementById('statusSelect');
+
+  if (!clientSelect || !clientSelect.value) {
+    showNotification("Please select a client", "error");
+    return;
+  }
+
+  // Collect items from table rows
+  var items = [];
+  var rows = document.querySelectorAll('tr.invoice-item-row');
+
+  rows.forEach(function(row) {
+    var serviceSelect = row.querySelector('.item-service-select');
+    var qtyInput = row.querySelector('.item-quantity');
+
+    if (serviceSelect && qtyInput && serviceSelect.value) {
+      var selectedService = _cachedServices.find(function(s) {
+        return s.id == serviceSelect.value;
+      });
+
+      if (selectedService) {
+        // Get rate from either input field or hidden in the service data
+        var rateInput = row.querySelector('.item-rate');
+        var unitPrice = selectedService.unitPrice || selectedService.rate || 0;
+
+        // If rateInput is an input element, use its value
+        if (rateInput && rateInput.tagName === 'INPUT') {
+          unitPrice = parseFloat(rateInput.value) || unitPrice;
+        }
+
+        items.push({
+          serviceId: parseInt(serviceSelect.value),
+          serviceName: selectedService.name,
+          quantity: parseInt(qtyInput.value) || 1,
+          unitPrice: unitPrice
+        });
+      }
+    }
+  });
+
+  if (items.length === 0) {
+    showNotification("Please add at least one service item", "error");
+    return;
+  }
+
+  // Calculate total amount from displayed amounts
+  var totalAmount = 0;
+  document.querySelectorAll('tr.invoice-item-row .item-amount').forEach(function(span) {
+    totalAmount += parseFloat(span.textContent.replace('$', '')) || 0;
+  });
+
+  var invoiceData = {
+    id: parseInt(invoiceId),
+    clientId: parseInt(clientSelect.value),
+    date: issueDateInput ? issueDateInput.value : new Date().toISOString().split('T')[0],
+    items: items,
+    totalAmount: totalAmount,
+    statusId: statusSelect ? parseInt(statusSelect.value) : 2
+  };
+
+  console.log("Submitting updated invoice data:", invoiceData);
+  updateInvoice(invoiceData);
+}
+
+function loadInvoiceForUpdate(invoiceId) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", API_BASE_URL + "/invoice/" + invoiceId, true);
+
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      var response = JSON.parse(xhr.responseText);
+      var invoice = response.data || response;
+
+      console.log("Loaded invoice for update:", invoice);
+
+      // Store invoice globally
+      window.currentInvoice = invoice;
+
+      // Update invoice number in header
+      var invoiceNumberEl = document.getElementById('invoiceNumber');
+      if (invoiceNumberEl) {
+        invoiceNumberEl.textContent = invoice.id;
+      }
+
+      // Populate client dropdown and select the current client
+      var clientSelect = document.querySelector('select[name="clientSelect"]');
+      if (clientSelect && invoice.clientId) {
+        clientSelect.value = invoice.clientId;
+
+        // Trigger change to populate email, phone, address
+        var changeEvent = new Event('change');
+        clientSelect.dispatchEvent(changeEvent);
+      }
+
+      // Set issue date
+      var issueDateInput = document.getElementById('issueDateInput');
+      if (issueDateInput && invoice.date) {
+        issueDateInput.value = invoice.date;
+      }
+
+      // Set status
+      var statusSelect = document.getElementById('statusSelect');
+      if (statusSelect && invoice.statusId) {
+        statusSelect.value = invoice.statusId;
+      }
+
+      // Clear existing items in table
+      var tableBody = document.getElementById('itemsTableBody');
+      if (tableBody) {
+        tableBody.innerHTML = '';
+      }
+
+      // Populate items
+      if (invoice.items && invoice.items.length > 0) {
+        invoice.items.forEach(function(item) {
+          addItemRowWithData(item);
+        });
+      } else {
+        // Add one empty row if no items
+        addItemRow();
+      }
+    } else {
+      console.error("Error loading invoice:", xhr.status);
+      showNotification("Error loading invoice data", "error");
+    }
+  };
+
+  xhr.onerror = function() {
+    console.error("Request failed");
+    showNotification("Failed to load invoice", "error");
+  };
+
+  xhr.send();
+}
+
+function addItemRowWithData(itemData) {
+  var tbody = document.getElementById('itemsTableBody');
+  if (!tbody) return;
+
+  var tr = document.createElement('tr');
+  tr.className = 'invoice-item-row group hover:bg-slate-50 dark:hover:bg-slate-800/20';
+
+  var tdService = document.createElement('td');
+  tdService.className = 'px-6 py-3';
+  var serviceSelect = document.createElement('select');
+  serviceSelect.className = 'item-service-select form-input w-full rounded border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm py-2';
+  fillServiceSelect(serviceSelect);
+
+  // Select the current service
+  if (itemData.serviceId) {
+    serviceSelect.value = itemData.serviceId;
+  }
+
+  serviceSelect.onchange = function() {
+    var selectedService = _cachedServices.find(function(s) {
+      return s.id == serviceSelect.value;
+    });
+    if (selectedService) {
+      rateInput.value = (selectedService.unitPrice || selectedService.rate || 0).toFixed(2);
+      updateRowAmount(tr);
+    }
+  };
+  tdService.appendChild(serviceSelect);
+
+  var tdQty = document.createElement('td');
+  tdQty.className = 'px-6 py-3';
+  var qtyInput = document.createElement('input');
+  qtyInput.type = 'number';
+  qtyInput.className = 'item-quantity form-input w-20 rounded border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm text-center py-2';
+  qtyInput.value = itemData.quantity || 1;
+  qtyInput.min = '1';
+  qtyInput.onchange = function() { updateRowAmount(tr); };
+  tdQty.appendChild(qtyInput);
+
+  var tdRate = document.createElement('td');
+  tdRate.className = 'px-6 py-3';
+  var rateInput = document.createElement('input');
+  rateInput.type = 'number';
+  rateInput.step = '0.01';
+  rateInput.className = 'item-rate form-input w-28 rounded border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm text-right py-2';
+  rateInput.value = (itemData.unitPrice || 0).toFixed(2);
+  rateInput.onchange = function() { updateRowAmount(tr); };
+  tdRate.appendChild(rateInput);
+
+  var tdAmount = document.createElement('td');
+  tdAmount.className = 'px-6 py-3 text-right';
+  var amountSpan = document.createElement('span');
+  amountSpan.className = 'item-amount text-sm font-semibold text-slate-900 dark:text-white';
+  amountSpan.textContent = '$' + ((itemData.quantity || 1) * (itemData.unitPrice || 0)).toFixed(2);
+  tdAmount.appendChild(amountSpan);
+
+  var tdDelete = document.createElement('td');
+  tdDelete.className = 'px-6 py-3 text-center';
+  var deleteBtn = document.createElement('button');
+  deleteBtn.type = 'button';
+  deleteBtn.className = 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded transition-colors';
+  deleteBtn.innerHTML = '<span class="material-symbols-outlined text-lg">delete</span>';
+  deleteBtn.onclick = function() {
+    tr.remove();
+    recalcTotal();
+  };
+  tdDelete.appendChild(deleteBtn);
+
+  tr.appendChild(tdService);
+  tr.appendChild(tdQty);
+  tr.appendChild(tdRate);
+  tr.appendChild(tdAmount);
+  tr.appendChild(tdDelete);
+
+  tbody.appendChild(tr);
+
+  recalcTotal();
+}
+
 function submitCreateInvoice() {
   var clientSelect = document.querySelector('select[name="clientSelect"]');
   var issueDateInput = document.querySelectorAll('input[type="date"]')[0];
@@ -738,7 +988,7 @@ function submitCreateInvoice() {
   var rows = document.querySelectorAll('tr.invoice-item-row');
   rows.forEach(function(row) {
     var serviceSelect = row.querySelector('select.item-service-select');
-    var qtyInput = row.querySelector('input.item-qty');
+    var qtyInput = row.querySelector('input.item-quantity');
 
     var serviceId = serviceSelect ? parseInt(serviceSelect.value) : 0;
     var qty = qtyInput ? parseInt(qtyInput.value) : 0;
@@ -775,10 +1025,19 @@ document.addEventListener('DOMContentLoaded', function() {
   // Check if we're on the invoice view page
   var urlParams = new URLSearchParams(window.location.search);
   var invoiceId = urlParams.get('id');
+  var currentPage = window.location.pathname.split('/').pop();
 
-  if (invoiceId) {
+  if (currentPage === 'invoice-view.html' && invoiceId) {
     // Load invoice details on view page
     getInvoiceById(invoiceId);
+  } else if (currentPage === 'update-invoice.html' && invoiceId) {
+    // Load data for update page
+    loadAllClients();
+    loadAllServices();
+    // Wait a bit for clients and services to load, then load invoice
+    setTimeout(function() {
+      loadInvoiceForUpdate(invoiceId);
+    }, 500);
   } else {
     // Load data for create/list pages
     loadAllClients();
@@ -791,7 +1050,7 @@ document.addEventListener('DOMContentLoaded', function() {
     clientSelect.addEventListener('change', onClientSelectChange);
   }
 
-  // Wire up Add Row buttons on create-invoice page
+  // Wire up Add Row buttons on create-invoice and update-invoice pages
   var addRowBtn = document.getElementById('addRowBtn');
   if (addRowBtn) addRowBtn.addEventListener('click', addItemRow);
 

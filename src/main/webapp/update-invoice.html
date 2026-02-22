@@ -3,7 +3,7 @@
 <html class="light" lang="en"><head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Create New Invoice - InvoiceManager</title>
+    <title>Update Invoice - InvoiceManager</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="js/script.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
@@ -72,13 +72,13 @@
             <!-- Page Header Actions -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 class="text-slate-900 dark:text-white text-3xl font-extrabold tracking-tight">Create New Invoice</h1>
-                    <p class="text-slate-500 dark:text-slate-400 mt-1">Generate a professional invoice for your clients instantly.</p>
+                    <h1 class="text-slate-900 dark:text-white text-3xl font-extrabold tracking-tight">Update Invoice #<span id="invoiceNumber">...</span></h1>
+                    <p class="text-slate-500 dark:text-slate-400 mt-1">Modify invoice details and line items.</p>
                 </div>
                 <div class="flex gap-3">
-                    <button class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+                    <button onclick="history.back()" class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
                         <span class="material-symbols-outlined text-lg">arrow_back</span>
-                        Back to Dashboard
+                        Back
                     </button>
                 </div>
             </div>
@@ -107,16 +107,16 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Client Email</label>
-                                    <input class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4" placeholder="email@example.com" type="email"/>
+                                    <input class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4" placeholder="email@example.com" type="email" readonly/>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Client Phone</label>
-                                    <input class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4" placeholder="+1 (555) 000-0000" type="tel"/>
+                                    <input class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4" placeholder="+1 (555) 000-0000" type="tel" readonly/>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Billing Address</label>
-                                <textarea class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4 resize-none" placeholder="Street Address, City, State, ZIP, Country" rows="2"></textarea>
+                                <textarea class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4 resize-none" placeholder="Street Address, City, State, ZIP, Country" rows="2" readonly></textarea>
                             </div>
                         </div>
                     </div>
@@ -128,16 +128,21 @@
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Invoice #</label>
+                                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Invoice Status</label>
                                 <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">INV-</span>
-                                    <input class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 pl-12 pr-4" type="text" value="2024-001"/>
+                                    <select id="statusSelect" class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4 appearance-none">
+                                        <option value="1">Paid</option>
+                                        <option value="2">Pending</option>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+                                        <span class="material-symbols-outlined">expand_more</span>
+                                    </div>
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Issue Date</label>
                                 <div class="relative">
-                                    <input class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4" type="date" value="2023-10-27"/>
+                                    <input id="issueDateInput" class="form-input w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary py-3 px-4" type="date" value="2026-02-22"/>
                                 </div>
                             </div>
                         </div>
@@ -190,13 +195,13 @@
                             </div>
                         </div>
                         <div class="mt-8 space-y-3">
-                            <button onclick="submitCreateInvoice()" type="button" class="w-full py-4 bg-primary text-white rounded-lg font-bold shadow-lg shadow-primary/25 hover:bg-blue-700 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
-                                <span class="material-symbols-outlined text-xl">send</span>
-                                Send Invoice
-                            </button>
-                            <button class="w-full py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2">
+                            <button onclick="submitUpdateInvoice()" type="button" class="w-full py-4 bg-primary text-white rounded-lg font-bold shadow-lg shadow-primary/25 hover:bg-blue-700 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
                                 <span class="material-symbols-outlined text-xl">save</span>
-                                Save as Draft
+                                Update Invoice
+                            </button>
+                            <button onclick="history.back()" class="w-full py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-lg font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-xl">cancel</span>
+                                Cancel
                             </button>
                         </div>
                     </div>
@@ -206,3 +211,4 @@
     </main>
 </div>
 </body></html>
+
